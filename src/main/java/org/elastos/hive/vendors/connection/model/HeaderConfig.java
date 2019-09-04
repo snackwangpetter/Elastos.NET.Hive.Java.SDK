@@ -28,17 +28,20 @@ public class HeaderConfig {
     private final AuthToken authToken ;
     private final String contentType ;
     private final String acceptEncoding;
+    private final String etagOrCtag;
 
     private HeaderConfig(){
         this.authToken = null ;
         this.contentType = null ;
         this.acceptEncoding = null ;
+        this.etagOrCtag = null ;
     }
 
     private HeaderConfig(Builder builder){
         this.authToken = builder.authToken ;
         this.contentType = builder.contentType ;
         this.acceptEncoding = builder.acceptEncoding ;
+        this.etagOrCtag = builder.etagOrCtag ;
     }
 
     public AuthToken getAuthToken() {
@@ -53,15 +56,21 @@ public class HeaderConfig {
         return acceptEncoding;
     }
 
+    public String getEtagOrCtag(){
+        return etagOrCtag;
+    }
+
     public static final class Builder {
         AuthToken authToken;
         String contentType;
         String acceptEncoding;
+        String etagOrCtag ;
 
         public Builder() {
             this.authToken = null ;
             this.contentType = null ;
             this.acceptEncoding = null ;
+            this.etagOrCtag = null ;
         }
 
         public Builder authToken(AuthToken authToken){
@@ -76,6 +85,11 @@ public class HeaderConfig {
 
         public Builder acceptEncoding(String acceptEncoding){
             this.acceptEncoding = acceptEncoding ;
+            return this ;
+        }
+
+        public Builder etagOrCtag(String etagOrCtag){
+            this.etagOrCtag = etagOrCtag ;
             return this ;
         }
 

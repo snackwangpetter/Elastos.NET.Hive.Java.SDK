@@ -34,6 +34,7 @@ public class HeaderInterceptor implements Interceptor{
     private static final String AUTHORIZATION = "Authorization";
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String IF_MATCH = "If-Match";//see also:https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_createuploadsession?view=odsp-graph-online#optional-request-headers
 
     private final HeaderConfig headerConfig ;
     public HeaderInterceptor(HeaderConfig headerConfig) {
@@ -60,6 +61,13 @@ public class HeaderInterceptor implements Interceptor{
             newRequest = addAcceptEncoding(newRequest);
         }else {
             newRequest = addAcceptEncoding(request);
+        }
+
+        //check & add If-Match header
+        if (newRequest!=null){
+            newRequest = addIFMatch(newRequest);
+        }else {
+            newRequest = addIFMatch(request);
         }
 
         if (newRequest!=null){
@@ -97,6 +105,16 @@ public class HeaderInterceptor implements Interceptor{
         }
         Request newRequest = realRequest.newBuilder()
                 .addHeader(ACCEPT_ENCODING , headerConfig.getAcceptEncoding())
+                .build();
+        return newRequest ;
+    }
+
+    private Request addIFMatch(Request realRequest){
+        if (headerConfig == null|| headerConfig.getEtagOrCtag() == null){
+            return realRequest ;
+        }
+        Request newRequest = realRequest.newBuilder()
+                .addHeader(IF_MATCH , headerConfig.getEtagOrCtag())
                 .build();
         return newRequest ;
     }
