@@ -10,11 +10,24 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPFSFiles implements IHiveFile {
     String fileName ;
+    String cid ;
 
-    IPFSFiles(String fileName){
+    IPFSFiles(String fileName , String cid){
         this.fileName = fileName ;
+        this.cid = cid ;
     }
 
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
+    }
 
     @Override
     public CompletableFuture<Void> putFile(String destFilename, String pathname, boolean encrypt) {
@@ -57,7 +70,7 @@ public class IPFSFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Void> listFile(HiveFileIteraterCallback hiveFileIteraterCallback) {
+    public CompletableFuture<String[]> listFile(HiveFileIteraterCallback hiveFileIteraterCallback) {
         return null;
     }
 

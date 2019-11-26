@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
 
 public interface IHiveFile {
-    CompletableFuture<Void> putFile(String destFilename , String pathname , boolean encrypt);
+    CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt);
     CompletableFuture<Void> putFileFromBuffer(String filename , ByteBuffer byteBuffer, int length , boolean encrypt);
     CompletableFuture<Length> getFileLength(String filename);
     CompletableFuture<Length> getFileToBuffer(String filename , boolean decrypt , ByteBuffer buffer , int bufferLen);
@@ -13,7 +13,7 @@ public interface IHiveFile {
     CompletableFuture<String> getFileName();
     CompletableFuture<Void> deleteFile(String filename);
     CompletableFuture<String[]> listFile();
-    CompletableFuture<Void> listFile(HiveFileIteraterCallback hiveFileIteraterCallback);
+    CompletableFuture<String[]> listFile(HiveFileIteraterCallback hiveFileIteraterCallback);
 
     CompletableFuture<Void> putValue(String key , ByteBuffer value , boolean encrypt);
     CompletableFuture<Void> setValue(String key , ByteBuffer value , boolean encrypt);

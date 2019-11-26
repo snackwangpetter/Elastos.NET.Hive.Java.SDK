@@ -1,5 +1,6 @@
 package org.elastos.hive.vendors.ipfs;
 
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.IHiveConnect;
 import org.elastos.hive.IHiveFile;
@@ -20,8 +21,10 @@ public class IPFSConnect implements IHiveConnect {
         return  mIPFSConnectInstance;
     }
 
+
     @Override
-    public void establishConnect() {
+    public void connect(Authenticator authenticator) {
+
     }
 
     @Override
@@ -35,7 +38,7 @@ public class IPFSConnect implements IHiveConnect {
     }
 
     @Override
-    public IHiveFile getHiveFile(String filename, String key) {
+    public IHiveFile createHiveFile(String filename, String key) {
         return new IPFSFiles(filename,key);
     }
 }

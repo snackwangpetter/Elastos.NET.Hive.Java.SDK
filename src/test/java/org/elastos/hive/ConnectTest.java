@@ -22,8 +22,15 @@ public class ConnectTest {
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
-        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions();
+        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(new Authenticator() {
+            @Override
+            public void requestAuthentication(String requestUrl) {
+
+            }
+        });
         hiveConnect = hiveClient.connect(hiveConnectOptions);
+
+
     }
 
     @AfterClass

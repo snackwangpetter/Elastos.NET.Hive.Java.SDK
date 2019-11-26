@@ -42,7 +42,7 @@ public class HiveClient {
             default:
                 break;
         }
-//        hiveConnect.establishConnect();
+        hiveConnect.connect(hiveConnectOptions.getAuthenticator());
         return hiveConnect;
     }
 

@@ -1,17 +1,47 @@
 package org.elastos.hive.vendors.onedrive;
 
-import org.elastos.hive.AuthHelper;
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.Persistent;
 
 public class OneDriveConnectOptions extends HiveConnectOptions {
 
     private String clientId;
     private String scope;
     private String redirectUrl;
-    private AuthHelper oneDriveAuthHelper ;
 
-    public OneDriveConnectOptions(AuthHelper oneDriveAuthHelper) {
+    public OneDriveConnectOptions(Authenticator authenticator) {
         setBackendType(HiveBackendType.HiveBackendType_OneDrive);
-        this.oneDriveAuthHelper = oneDriveAuthHelper ;
+        setAuthenticator(authenticator);
+    }
+
+    public OneDriveConnectOptions(Authenticator authenticator , Persistent persistent) {
+        setBackendType(HiveBackendType.HiveBackendType_OneDrive);
+        setAuthenticator(authenticator);
+        setPersistent(persistent);
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
     }
 }
