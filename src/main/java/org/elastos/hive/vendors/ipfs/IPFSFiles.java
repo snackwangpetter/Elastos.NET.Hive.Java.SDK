@@ -5,6 +5,7 @@ import org.elastos.hive.Length;
 import org.elastos.hive.Void;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -30,12 +31,12 @@ public class IPFSFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Void> putFile(String destFilename, String pathname, boolean encrypt) {
+    public CompletableFuture<Void> putFile(String destFilename, String sorceFilename, boolean encrypt) {
         return null;
     }
 
     @Override
-    public CompletableFuture<Void> putFileFromBuffer(String filename, ByteBuffer byteBuffer, int length, boolean encrypt) {
+    public CompletableFuture<Void> putFileFromBuffer(String filename, byte[] data, int length, boolean encrypt) {
         return null;
     }
 
@@ -45,12 +46,12 @@ public class IPFSFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Length> getFileToBuffer(String filename, boolean decrypt, ByteBuffer buffer, int bufferLen) {
+    public CompletableFuture<byte[]> getFileToBuffer(String filename, boolean decrypt, int bufferLen) {
         return null;
     }
 
     @Override
-    public CompletableFuture<Void> getFile(String filename, boolean decrypt, String storePath) {
+    public CompletableFuture<Length> getFile(String filename, boolean decrypt, String storePath) {
         return null;
     }
 
@@ -75,17 +76,17 @@ public class IPFSFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, ByteBuffer value, boolean encrypt) {
+    public CompletableFuture<Void> putValue(String key, byte[] value, int length, boolean encrypt) {
         return null;
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, ByteBuffer value, boolean encrypt) {
+    public CompletableFuture<Void> setValue(String key, byte[] value, int length, boolean encrypt) {
         return null;
     }
 
     @Override
-    public CompletableFuture<ByteBuffer> getValue(String key, boolean decrypt) {
+    public CompletableFuture<ArrayList<byte[]>> getValue(String key, boolean decrypt) {
         return null;
     }
 

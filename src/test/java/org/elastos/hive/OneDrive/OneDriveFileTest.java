@@ -1,292 +1,227 @@
 package org.elastos.hive.OneDrive;
 
-import org.elastos.hive.Callback;
-import org.elastos.hive.Children;
-import org.elastos.hive.Client;
-import org.elastos.hive.Directory;
-import org.elastos.hive.Drive;
-import org.elastos.hive.File;
-import org.elastos.hive.HiveException;
+import org.elastos.hive.Authenticator;
+import org.elastos.hive.HiveClient;
+import org.elastos.hive.HiveClientOptions;
+import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.IHiveConnect;
+import org.elastos.hive.IHiveFile;
+import org.elastos.hive.Length;
 import org.elastos.hive.Void;
+import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class OneDriveFileTest {
-	private static Drive drive;
-	private static Client client;
-	private static File testFile;
-	private static Directory parentDirForMoveTo;
-	private boolean callbackInvoked = false;
 
-	@Test public void testGetId() {
-		assertNotNull(testFile.getId());
-	}
+    private static final String APPID = "afd3d647-a8b7-4723-bf9d-1b832f43b881";//f0f8fdc1-294e-4d5c-b3d8-774147075480
+    private static final String SCOPE = "User.Read Files.ReadWrite.All offline_access";//offline_access Files.ReadWrite
+    private static final String REDIRECTURL = "http://localhost:12345";//http://localhost:44316
 
-	@Test public void testGetPath() {
-		assertNotNull(testFile.getPath());
-	}
 
-	@Test public void testGetParentPath() {
-		assertNotNull(testFile.getParentPath());
-	}
+    private static IHiveConnect hiveConnect ;
+    private static HiveClient hiveClient ;
+    private static IHiveFile hiveFile ;
 
-	@Test public void testGetLastInfo() {
-		File.Info info = testFile.getLastInfo();
-		assertNotNull(info);
-		assertNotNull(info.get(File.Info.name));
-		assertNotNull(info.get(File.Info.itemId));
-		assertTrue(info.containsKey(File.Info.size));
-	}
+    @Test
+    public void testGetInstance() {
+        assertNotNull(hiveFile);
+    }
 
-	@Test public void testGetInfo() {
-		try {
-			File.Info info = testFile.getInfo().get();
-			assertNotNull(info);
-			assertNotNull(info.get(File.Info.name));
-			assertNotNull(info.get(File.Info.itemId));
-			assertTrue(info.containsKey(File.Info.size));
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testGetInfo failed");
-		}
-	}
-	
-	@Test public void testGetInfoAsync() {
-		callbackInvoked = false;
-		Callback<File.Info> callback = new Callback<File.Info>() {
-			@Override
-			public void onError(HiveException e) {
-				e.printStackTrace();
-				fail();
-			}
+    @Test
+    public void testPutFile() {
+        String testFilepath = System.getProperty("user.dir")+"/src/resources/org/elastos/hive/test.txt";
 
-			@Override
-			public void onSuccess(File.Info info) {
-				callbackInvoked = true;
-				assertNotNull(info);
-				assertNotNull(info.get(File.Info.name));
-				assertNotNull(info.get(File.Info.itemId));
-				assertTrue(info.containsKey(File.Info.size));
-			}
-		};
-		
-		try {
-			testFile.getInfo(callback).get();
-			assertTrue(callbackInvoked);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testGetInfoAsync failed");
-		}
-	}
+        try {
+            hiveFile.putFile("hi.txt",testFilepath,false).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
-	@Test public void testMoveTo() {
-		try {
-			File tempFile = drive.createFile("/testMoveToFile" + System.currentTimeMillis()).get();
-			assertNotNull(tempFile);
-			
-			String originPath = tempFile.getPath();
-			int childCount = parentDirForMoveTo.getChildren().get().getContent().size();
-			tempFile.moveTo(parentDirForMoveTo.getPath()).get();
 
-			//1. Check the parent has a new child.
-			int newChildCount = parentDirForMoveTo.getChildren().get().getContent().size();
-			assertEquals(childCount + 1, newChildCount);
+    }
 
-			//2. Check: the origin and the new path is different
-			assertFalse(originPath.equals(tempFile.getPath()));
+    @Test
+    public void testPutBuffer() {
+        String testString = "this is test for buffer";
+        byte[] data = testString.getBytes() ;
 
-			//3. Check: the origin path is invalid.
-			try {
-				drive.getFile(originPath).get();
-				fail(String.format("The file has moved, the origin path is invalid: %s", originPath));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testMoveTo failed");
-		}
-	}
-	
-	@Test public void testMoveToAsync() {
-		callbackInvoked = false;
-		Callback<Void> callback = new Callback<Void>() {
-			@Override
-			public void onError(HiveException e) {
-				e.printStackTrace();
-				fail();
-			}
+        CompletableFuture future = hiveFile.putFileFromBuffer("hi2.txt",data , data.length,false);
 
-			@Override
-			public void onSuccess(Void none) {
-				callbackInvoked = true;
-			}
-		};
-		
-		try {
-			String originPath = testFile.getPath();
-			int childCount = parentDirForMoveTo.getChildren().get().getContent().size();
-			testFile.moveTo(parentDirForMoveTo.getPath(), callback).get();
-			assertTrue(callbackInvoked);
+        waitFinish(future);
 
-			//1. Check the parent has a new child.
-			int newChildCount = parentDirForMoveTo.getChildren().get().getContent().size();
-			assertEquals(childCount + 1, newChildCount);
+    }
 
-			//2. Check: the origin and the new path is different
-			assertFalse(originPath.equals(testFile.getPath()));
+    @Test
+    public void testFileLength(){
+        try {
+            Length length = hiveFile.getFileLength("hi.txt").get();
+            LogUtil.d("length = "+length.getLength());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 
-			//3. Check: the origin path is invalid.
-			try {
-				drive.getDirectory(originPath).get();
-				fail(String.format("The file has moved, the origin path is invalid: %s", originPath));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testMoveToAsync failed");
-		}
-	}
+    @Test
+    public void testGetFile(){
+        try {
+            hiveFile.getFile("hi.txt",false,"/Users/wangran/tmp/hi.txt").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test public void testCopyTo() {
-		Directory parentDir = null;
-		try {
-			String parentPath = "/testCopyToParentDir" + System.currentTimeMillis();
-			parentDir = drive.createDirectory(parentPath).get();
-			assertNotNull(parentDir);
-			testFile.copyTo(parentPath).get();
+    @Test
+    public void testGetFileBuffer(){
+        try {
+            byte[] bytes = hiveFile.getFileToBuffer("hi.txt",false,-1).get();
 
-			Thread.sleep(5000);
-			Children children = parentDir.getChildren().get();
-			assertNotNull(children);
-			assertEquals(1, children.getContent().size());
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testCopyTo failed");
-		}
-		finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-	
-	@Test public void testCopyToAsync() {
-		callbackInvoked = false;
-		Callback<Void> callback = new Callback<Void>() {
-			@Override
-			public void onError(HiveException e) {
-				e.printStackTrace();
-				fail();
-			}
+            String str = new String(bytes);
+            LogUtil.d("result = "+str);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 
-			@Override
-			public void onSuccess(Void none) {
-				callbackInvoked = true;
-			}
-		};
 
-		Directory parentDir = null;
-		try {
-			String parentPath = "/testCopyToAsyncParentDir" + System.currentTimeMillis();
-			parentDir = drive.createDirectory(parentPath).get();
-			assertNotNull(parentDir);
-			testFile.copyTo(parentPath, callback).get();
-			assertTrue(callbackInvoked);
+    @Test
+    public void testDeleteFile(){
+        String deleteTestFile = "hi.txt";
 
-			Thread.sleep(5000);
-			Children children = parentDir.getChildren().get();
-			assertNotNull(children);
-			assertEquals(1, children.getContent().size());
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testCopyToAsync failed");
-		}
-		finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+//        CompletableFuture future = hiveFile.putFile(deleteTestFile,System.getProperty("user.dir")+"/src/resources/org/elastos/hive/test.txt",false)
+////                .thenApply(result -> testEqual())
+//                .thenApply(result -> hiveFile.deleteFile(deleteTestFile));
 
-	@Test public void testCopyToInvalid() {
-		Directory parentDir = null;
-		try {
-			String parentPath = "/parentDir" + System.currentTimeMillis();
-			parentDir = drive.createDirectory(parentPath).get();
-			assertNotNull(parentDir);
-			String originPath = testFile.getPath();
-			testFile.copyTo(parentPath).get();
+        try {
+            hiveFile.deleteFile(deleteTestFile).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+//        waitFinish(future);
+    }
 
-			//1. Check the parent has a new child.
-			Thread.sleep(2000);
-			Children children = parentDir.getChildren().get();
-			assertNotNull(children);
-			assertEquals(1, children.getContent().size());
+    private CompletableFuture testEqual(String expected , String actual){
+        CompletableFuture<Void> completableFuture = new CompletableFuture();
+        assertEquals("","");
+        completableFuture.complete(new Void());
+        return completableFuture;
+    }
 
-			//2. Check: the origin and the new path is same
-			assertEquals(originPath, testFile.getPath());
+    @Test
+    public void testListFiles(){
+        try {
+            String[] files = hiveFile.listFile().get();
+            for (int i = 0 ; i<files.length ; i++){
+                LogUtil.d("file = "+files[i]);
+                assertNotNull(files[i]);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 
-			//3. Check: the origin path is valid.
-			try {
-				drive.getFile(originPath).get();
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail(String.format("The origin path should be valid: %s", originPath));
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			fail("testCopyToInvalid failed");
-		}
-		finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+    @Test
+    public void testListFilesAsync(){
 
-	@BeforeClass
-	static public void setUp() throws Exception {
-		try {
-			client = OneDriveTestBase.login();
-			assertNotNull(client);
-			drive = client.getDefaultDrive().get();
-			assertNotNull(drive);
-			testFile = drive.createFile("/testFile" + System.currentTimeMillis()).get();
-			assertNotNull(testFile);
-			parentDirForMoveTo = drive.createDirectory("/parentDirForMoveTo" + System.currentTimeMillis()).get();
-			assertNotNull(parentDirForMoveTo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        CompletableFuture future = hiveFile.listFile(new IHiveFile.HiveFileIteraterCallback(){
+            @Override
+            public boolean callback(String filename) {
+                LogUtil.d("file = "+filename);
+                return false;
+            }
+        });
+
+        waitFinish(future);
+    }
+
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        HiveClientOptions hiveOptions = new HiveClientOptions();
+        hiveClient = HiveClient.createInstance(hiveOptions);
+
+        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(new Authenticator() {
+            @Override
+            public void requestAuthentication(String requestUrl) {
+                try {
+                    Desktop.getDesktop().browse(new URI(requestUrl));
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    fail("Authenticator failed");
+                }
+            }
+        });
+        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
+        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
+        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
+
+
+        hiveConnect = hiveClient.connect(hiveConnectOptions);
+
+        hiveFile = hiveConnect.createHiveFile("/bar","");
+
+    }
+
+
 
     @AfterClass
-    static public void tearDown() throws Exception {
-    	try {
-    		testFile.deleteItem().get();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static void tearDown() throws Exception {
+        hiveClient.disConnect(hiveConnect);
+        hiveClient.close();
+    }
 
-    	try {
-    		parentDirForMoveTo.deleteItem().get();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    private void waitFinish(CompletableFuture future){
+        while(!future.isDone()){
+            try {
+                LogUtil.d("1000");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-    	client.logout();
+    private void createTestRootPath(){
+    }
+
+    private void getContentFromFile(String filepath){
+        File file = new File(filepath);
+        try {
+            FileInputStream out = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(out);
+            int ch = 0;
+            while ((ch = isr.read()) != -1) {
+                System.out.print((char) ch);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 }
