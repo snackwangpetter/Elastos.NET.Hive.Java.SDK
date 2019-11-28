@@ -26,8 +26,6 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.Directory;
-import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.Length;
@@ -262,40 +260,6 @@ class IPFSRpcHelper implements AuthHelper {
 		return future;
 	}
 
-	CompletableFuture<Directory> invokeDirectoryCallback(PackValue value) {
-		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
-
-		if (value.getException() != null) {
-			value.getCallback().onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		Directory object = (Directory)value.getValue();
-		@SuppressWarnings("unchecked")
-		Callback<Directory> callback = (Callback<Directory>)value.getCallback();
-		callback.onSuccess(object);
-		future.complete(object);
-		return future;
-	}
-
-	CompletableFuture<File> invokeFileCallback(PackValue value) {
-		CompletableFuture<File> future = new CompletableFuture<File>();
-
-		if (value.getException() != null) {
-			value.getCallback().onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		File object = (File)value.getValue();
-		@SuppressWarnings("unchecked")
-		Callback<File> callback = (Callback<File>)value.getCallback();
-		callback.onSuccess(object);
-		future.complete(object);
-		return future;
-	}
-
 	CompletableFuture<Void> invokeVoidCallback(PackValue value) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
@@ -308,23 +272,6 @@ class IPFSRpcHelper implements AuthHelper {
 		Void object = new Void();
 		@SuppressWarnings("unchecked")
 		Callback<Void> callback = (Callback<Void>)value.getCallback();
-		callback.onSuccess(object);
-		future.complete(object);
-		return future;
-	}
-
-	CompletableFuture<Length> invokeLengthCallback(PackValue value) {
-		CompletableFuture<Length> future = new CompletableFuture<Length>();
-
-		if (value.getException() != null) {
-			value.getCallback().onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		Length object = (Length) value.getValue();
-		@SuppressWarnings("unchecked")
-		Callback<Length> callback = (Callback<Length>)value.getCallback();
 		callback.onSuccess(object);
 		future.complete(object);
 		return future;

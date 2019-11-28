@@ -48,7 +48,7 @@ public class OneDriveKVTest {
         try {
 
             byte[] data = "test".getBytes() ;
-            future = hiveFile.putValue("KVT",data,data.length,false).get();
+            future = hiveFile.putValue("KVT",data,false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -92,7 +92,7 @@ public class OneDriveKVTest {
     public void testSetValue() {
         try {
             byte[] data = "setValue".getBytes() ;
-            hiveFile.setValue("KVT",data,data.length,false).get();
+            hiveFile.setValue("KVT",data,false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

@@ -62,7 +62,7 @@ public class OneDriveFileTest {
         String testString = "this is test for buffer";
         byte[] data = testString.getBytes() ;
 
-        CompletableFuture future = hiveFile.putFileFromBuffer("hi2.txt",data , data.length,false);
+        CompletableFuture future = hiveFile.putFileFromBuffer("hi2.txt",data ,false);
 
         waitFinish(future);
 

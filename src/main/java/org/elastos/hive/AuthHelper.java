@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 public interface AuthHelper {
 	/**
 	 * get AuthToken
-	 * @return Current drivetype
+	 * @return Current authtoken
 	 */
 	AuthToken getToken();
 

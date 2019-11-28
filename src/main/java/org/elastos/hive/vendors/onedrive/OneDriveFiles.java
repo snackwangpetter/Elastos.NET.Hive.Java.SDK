@@ -44,7 +44,7 @@ public class OneDriveFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Void> putFileFromBuffer(String destFilename, byte[] data, int length, boolean encrypt) {
+    public CompletableFuture<Void> putFileFromBuffer(String destFilename, byte[] data, boolean encrypt) {
         return authHelper.checkExpired()
                 .thenCompose(result ->writeToBackend(destFilename, null ,data));
     }
@@ -93,28 +93,17 @@ public class OneDriveFiles implements IHiveFile {
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, byte[] value, int length, boolean encrypt) {
+    public CompletableFuture<Void> putValue(String key, byte[] value, boolean encrypt) {
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutValue(key,value));
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, byte[] value, int length, boolean encrypt) {
-
+    public CompletableFuture<Void> setValue(String key, byte[] value, boolean encrypt) {
         return authHelper.checkExpired()
                 .thenCompose(result -> doDeleteFile(key))
                 .thenCompose(result -> doMergeLengthAndData(value)
-                        .thenCompose(data -> putFileFromBuffer(key,data,data.length,encrypt)));
-//        try {
-//            doDeleteFile(key).get();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//
-//        byte[] data = mergeLengthAndData(value);
-//        return putFileFromBuffer(key,data,data.length,encrypt);
+                        .thenCompose(data -> putFileFromBuffer(key,data,encrypt)));
     }
 
     @Override
@@ -134,7 +123,6 @@ public class OneDriveFiles implements IHiveFile {
     public CompletableFuture<Void> deleteValueFromKey(String key) {
         return authHelper.checkExpired()
                 .thenCompose(result -> doDeleteFile(key));
-//        return doDeleteFile(key);
     }
 
     private CompletableFuture<ArrayList<byte[]>> doGetValue(String key , boolean decrypt){
