@@ -23,7 +23,7 @@
 package org.elastos.hive.vendors.ipfs;
 
 public class IPFSConstance {
-    public static final String URLFORMAT    = "http://%s/api/v0/";
+    public static final String URLFORMAT    = "http://%s:%d/api/v0/";
     public static final String DEFAULT_PORT = "9095";
     public static final String JSON			= "application/json";
     public static final String PREFIX       = "/ipfs/";
@@ -45,12 +45,19 @@ public class IPFSConstance {
     public static final String RM  			= "files/rm";
     public static final String CP  			= "files/cp";
     public static final String MV  			= "files/mv";
-    public static final String LS  			= "files/ls";
+//    public static final String LS  			= "files/ls";
     public static final String WRITE  		= "files/write";
     public static final String READ  		= "files/read";
     public static final String STAT			= "files/stat";
     public static final String PUBLISH		= "name/publish";
     public static final String NAMERESOLVE 	= "name/resolve";
+
+    public static final String ADD          = "add";
+    public static final String CAT          = "cat";
+    public static final String LS          = "file/ls";
+    public static final String VERSION          = "version";
+
+
 
 
     public enum Type{

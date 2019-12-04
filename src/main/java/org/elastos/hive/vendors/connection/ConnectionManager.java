@@ -35,7 +35,7 @@ public class ConnectionManager {
 
     private static String onedriveBaseUrl ;
     private static String authBaseUrl ;
-    private static String ipfsBaseUrl ;
+    private static String ipfsBaseUrl ="http://www.baidu.com";
 
     private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();

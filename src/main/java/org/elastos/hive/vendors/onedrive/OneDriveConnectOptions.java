@@ -10,6 +10,13 @@ public class OneDriveConnectOptions extends HiveConnectOptions {
     private String scope;
     private String redirectUrl;
 
+
+    public OneDriveConnectOptions(String clientId, String scope, String redirectUrl , Authenticator authenticator) {
+        this.clientId = clientId;
+        this.scope = scope;
+        this.redirectUrl = redirectUrl;
+    }
+
     public OneDriveConnectOptions(Authenticator authenticator) {
         setBackendType(HiveBackendType.HiveBackendType_OneDrive);
         setAuthenticator(authenticator);

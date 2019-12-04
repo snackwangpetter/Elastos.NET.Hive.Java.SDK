@@ -71,6 +71,6 @@ public class OneDriveConnect implements IHiveConnect {
 
     @Override
     public IHiveFile createHiveFile(String filename, String key) {
-        return new OneDriveFiles(filename , authHelper);
+        return new OneDriveFile(filename , authHelper);
     }
 }

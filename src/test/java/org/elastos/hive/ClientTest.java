@@ -1,15 +1,14 @@
-package org.elastos.hive.OneDrive;
+package org.elastos.hive;
 
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
-import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class OneDriveClientTest {
+public class ClientTest {
     private static HiveClient hiveClient ;
 
     @Test

@@ -24,19 +24,25 @@ package org.elastos.hive.vendors.ipfs.network;
 
 import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 import org.elastos.hive.vendors.ipfs.IPFSConstance;
+import org.elastos.hive.vendors.ipfs.network.model.AddFileResponse;
 import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
+import org.elastos.hive.vendors.ipfs.network.model.ListFileResponse;
 import org.elastos.hive.vendors.ipfs.network.model.PublishResponse;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface IPFSApi {
@@ -102,4 +108,19 @@ public interface IPFSApi {
                                   @Query(IPFSConstance.PATH) String path ,
                                   @Query(IPFSConstance.CREATE) boolean create, 
                                   @Body RequestBody body);
+
+//    @Multipart
+    @POST(IPFSConstance.ADD)
+    Call<AddFileResponse> addFile(@Body RequestBody file);
+
+    @POST(IPFSConstance.LS)//arg [string]: The path to the IPFS object(s) to list links from. Required: yes.
+    Call<ListFileResponse> listFile(@Query(IPFSConstance.ARG) String ipfsObjPath);
+
+    @POST(IPFSConstance.CAT)//arg [string]: The path to the IPFS object(s) to be outputted. Required: yes.
+    Call<ResponseBody> catFile(@Query(IPFSConstance.ARG) String ipfsObjPath);
+
+    @POST("http://{address}:{port}/version")
+    Call<NoBodyEntity> version(@Path("address") String address,@Path("port")int port);
+
+
 }

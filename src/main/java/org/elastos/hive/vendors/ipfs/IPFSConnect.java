@@ -7,7 +7,13 @@ import org.elastos.hive.IHiveFile;
 
 public class IPFSConnect implements IHiveConnect {
     private static IPFSConnect mIPFSConnectInstance ;
+    private IPFSConnectOptions ipfsConnectOptions ;
+    private IPFSRpc ipfsRpc ;
+
     private IPFSConnect(IPFSConnectOptions ipfsConnectOptions){
+        this.ipfsConnectOptions = ipfsConnectOptions ;
+        ipfsRpc = new IPFSRpc(ipfsConnectOptions.hiveRpcNodes);
+
     }
 
     public static IHiveConnect createInstance(HiveConnectOptions hiveConnectOptions){
@@ -25,6 +31,12 @@ public class IPFSConnect implements IHiveConnect {
     @Override
     public void connect(Authenticator authenticator) {
 
+        try {
+            ipfsRpc.checkReachable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -39,6 +51,6 @@ public class IPFSConnect implements IHiveConnect {
 
     @Override
     public IHiveFile createHiveFile(String filename, String key) {
-        return new IPFSFiles(filename,key);
+        return new IPFSFile(filename,key,ipfsRpc);
     }
 }

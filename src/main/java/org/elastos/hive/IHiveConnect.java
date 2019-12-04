@@ -1,7 +1,5 @@
 package org.elastos.hive;
 
-import java.util.concurrent.CompletableFuture;
-
 public interface IHiveConnect {
     void connect(Authenticator authenticator);
     void disConnect();

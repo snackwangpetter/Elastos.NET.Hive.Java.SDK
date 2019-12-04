@@ -8,6 +8,7 @@ import org.elastos.hive.Void;
 import org.elastos.hive.utils.DigitalUtil;
 import org.elastos.hive.utils.HeaderUtil;
 import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
@@ -29,10 +30,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class OneDriveFiles implements IHiveFile {
+public class OneDriveFile implements IHiveFile {
     private String filename ;
     private AuthHelper authHelper;
-    OneDriveFiles (String filename , AuthHelper authHelper){
+    OneDriveFile(String filename , AuthHelper authHelper){
         this.filename = filename ;
         this.authHelper = authHelper ;
     }
@@ -279,7 +280,7 @@ public class OneDriveFiles implements IHiveFile {
                 future.complete(lengthObj);
             }
 
-            long total = saveFileFromResponse(storePath , response);
+            long total = ResponseHelper.saveFileFromResponse(storePath , response);
             lengthObj = new Length(total);
             future.complete(lengthObj);
         } catch (HiveException e) {
@@ -298,7 +299,7 @@ public class OneDriveFiles implements IHiveFile {
                 return future;
             }
 
-            byte[] bytes = getBuffer(response);
+            byte[] bytes = ResponseHelper.getBuffer(response);
             if (bytes == null){
                 future.complete(new byte[0]);
             }
@@ -335,50 +336,50 @@ public class OneDriveFiles implements IHiveFile {
         return response;
     }
 
-    private byte[] getBuffer(Response response){
-        byte[] data = null;
-        try {
-            ResponseBody body = (ResponseBody) response.body();
-            data = body.bytes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
-
-
-    private long saveFileFromResponse(String storeFilepath , Response response) throws HiveException{
-        ResponseBody body = (ResponseBody) response.body();
-        FileOutputStream cacheStream = null;
-        long total = 0;
-        try {
-            //write the data to the cache file.
-            InputStream data = body.byteStream();
-
-            cacheStream = new FileOutputStream(storeFilepath);
-            byte[] b = new byte[1024];
-            int length = 0;
-
-            while((length = data.read(b)) > 0){
-                cacheStream.write(b, 0, length);
-                total += length;
-            }
-
-            data.close();
-        } catch (Exception e) {
-            throw new HiveException(e.getMessage());
-        }
-        finally {
-            try {
-                if (cacheStream != null) cacheStream.close();
-                body.close();
-            } catch (Exception e) {
-                throw new HiveException(e.getMessage());
-            }
-        }
-
-        return total;
-    }
+//    private byte[] getBuffer(Response response){
+//        byte[] data = null;
+//        try {
+//            ResponseBody body = (ResponseBody) response.body();
+//            data = body.bytes();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return data;
+//    }
+//
+//
+//    private long saveFileFromResponse(String storeFilepath , Response response) throws HiveException{
+//        ResponseBody body = (ResponseBody) response.body();
+//        FileOutputStream cacheStream = null;
+//        long total = 0;
+//        try {
+//            //write the data to the cache file.
+//            InputStream data = body.byteStream();
+//
+//            cacheStream = new FileOutputStream(storeFilepath);
+//            byte[] b = new byte[1024];
+//            int length = 0;
+//
+//            while((length = data.read(b)) > 0){
+//                cacheStream.write(b, 0, length);
+//                total += length;
+//            }
+//
+//            data.close();
+//        } catch (Exception e) {
+//            throw new HiveException(e.getMessage());
+//        }
+//        finally {
+//            try {
+//                if (cacheStream != null) cacheStream.close();
+//                body.close();
+//            } catch (Exception e) {
+//                throw new HiveException(e.getMessage());
+//            }
+//        }
+//
+//        return total;
+//    }
 
     private CompletableFuture<String[]> doListFile(){
         CompletableFuture future = new CompletableFuture();
