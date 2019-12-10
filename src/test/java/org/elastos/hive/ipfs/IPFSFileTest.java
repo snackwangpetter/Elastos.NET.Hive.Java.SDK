@@ -3,6 +3,7 @@ package org.elastos.hive.ipfs;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.IHiveConnect;
 import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
@@ -23,12 +24,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class IPFSFileTest {
     private static IHiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
-    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[1];
+    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[5];
     private static IPFSFile hiveFile ;
 
     private static final CID EXPECTED_CID = new CID("QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ");
@@ -45,21 +49,29 @@ public class IPFSFileTest {
 
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
-        hiveRpcNodes[0] = new HiveRpcNode("3.133.166.156",5001);
-//        hiveRpcNodes[1] = new HiveRpcNode("13.59.79.222",5001);
-//        hiveRpcNodes[2] = new HiveRpcNode("3.133.71.168",5001);
-//        hiveRpcNodes[0] = new HiveRpcNode("107.191.44.124",5001);
+        hiveRpcNodes[0] = new HiveRpcNode("127.0.0.1",5001);
+        hiveRpcNodes[1] = new HiveRpcNode("3.133.166.156",5001);
+        hiveRpcNodes[2] = new HiveRpcNode("13.59.79.222",5001);
+        hiveRpcNodes[3] = new HiveRpcNode("3.133.71.168",5001);
+        hiveRpcNodes[4] = new HiveRpcNode("107.191.44.124",5001);
+
 
 //        hiveRpcNodes[0] = new HiveRpcNode("127.0.0.1",5001);
 
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
+        try {
+            hiveConnect = hiveClient.connect(hiveConnectOptions);
+        } catch (HiveException e) {
+            e.printStackTrace();
+        }
 
-        hiveFile = hiveConnect.createHiveFile("","");
+        if (hiveConnect!=null){
+            hiveFile = hiveConnect.createHiveFile("","");
+        }
     }
 
     @AfterClass
@@ -75,57 +87,76 @@ public class IPFSFileTest {
 
     @Test
     public void testPutFile() {
-        try {
-            CID cid = hiveFile.putFile(TEST_FILE_PATH,false).get();
-            assertEquals(EXPECTED_CID.getCid() , cid.getCid());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        if (hiveFile!=null){
+            try {
+                CompletableFuture<CID> future = hiveFile.putFile(TEST_FILE_PATH,false);
+                CID cid = future.get();
+                assertEquals(EXPECTED_CID.getCid() , cid.getCid());
+            } catch (InterruptedException e) {
+                assertNull(e);
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                assertNull(e);
+                e.printStackTrace();
+            }
         }
     }
 
     @Test
     public void testPutFileAsync() {
-        CompletableFuture future = hiveFile.putFile(TEST_FILE_PATH, false, cid -> {
-            LogUtil.d("result == " + cid.getCid());
-            assertEquals(EXPECTED_CID.getCid() , cid.getCid());
-        });
-        TestUtils.waitFinish(future);
+        if (hiveFile!=null) {
+            CompletableFuture future = hiveFile.putFile(TEST_FILE_PATH, false, cid -> {
+                LogUtil.d("result == " + cid.getCid());
+                assertEquals(EXPECTED_CID.getCid(), cid.getCid());
+            });
+            TestUtils.waitFinish(future);
+            assertFalse(future.isCompletedExceptionally());
+        }
     }
 
     @Test
     public void testPutBuffer() {
-        try {
-            CID cid = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(),false).get();
-            LogUtil.d("result == " + cid.getCid());
-            assertEquals(EXPECTED_CID.getCid() , cid.getCid());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        if (hiveFile!=null) {
+            try {
+                CID cid = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(), false).get();
+                LogUtil.d("result == " + cid.getCid());
+                assertEquals(EXPECTED_CID.getCid(), cid.getCid());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                assertNull(e);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                assertNull(e);
+            }
         }
     }
 
     @Test
     public void testPutBufferAsync() {
-        CompletableFuture future = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(), false, cid -> {
-            LogUtil.d("result == "+cid.getCid());
-            assertEquals(EXPECTED_CID.getCid() , cid.getCid());
-        });
-        TestUtils.waitFinish(future);
+        if (hiveFile!=null) {
+            CompletableFuture future = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(), false, cid -> {
+                LogUtil.d("result == " + cid.getCid());
+                assertEquals(EXPECTED_CID.getCid(), cid.getCid());
+            });
+            TestUtils.waitFinish(future);
+            assertFalse(future.isCompletedExceptionally());
+        }
     }
 
     @Test
     public void testGetFileLength() {
-        try {
-            Length length = hiveFile.getFileLength(TEST_CID).get();
-            LogUtil.d("length="+length.getLength());
-            assertEquals(EXPECTED_LENGTH.getLength(),length.getLength());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        if (hiveFile!=null) {
+            try {
+                Length length = hiveFile.getFileLength(TEST_CID).get();
+                LogUtil.d("length=" + length.getLength());
+                assertEquals(EXPECTED_LENGTH.getLength(), length.getLength());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                assertNull(e);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                assertNull(e);
+            }
         }
     }
 
@@ -136,6 +167,7 @@ public class IPFSFileTest {
             assertEquals(EXPECTED_LENGTH.getLength(),length.getLength());
         });
         TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
     }
 
     @Test
@@ -154,8 +186,10 @@ public class IPFSFileTest {
             LogUtil.d("actualMD5="+actualMD5);
             LogUtil.d("length="+length.getLength());
         } catch (InterruptedException e) {
+            assertNull(e);
             e.printStackTrace();
         } catch (ExecutionException e) {
+            assertNull(e);
             e.printStackTrace();
         }
     }
@@ -173,6 +207,7 @@ public class IPFSFileTest {
         });
 
         TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
     }
 
     @Test
@@ -185,8 +220,10 @@ public class IPFSFileTest {
 
             LogUtil.d("data="+dataString);
         } catch (InterruptedException e) {
+            assertNull(e);
             e.printStackTrace();
         } catch (ExecutionException e) {
+            assertNull(e);
             e.printStackTrace();
         }
     }
@@ -201,5 +238,6 @@ public class IPFSFileTest {
             LogUtil.d("data="+dataString);
         });
         TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
     }
 }

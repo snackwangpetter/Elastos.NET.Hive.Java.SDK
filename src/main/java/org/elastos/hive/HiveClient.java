@@ -1,8 +1,9 @@
 package org.elastos.hive;
 
-import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.ipfs.IPFSConnect;
+import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.onedrive.OneDriveConnect;
+import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 
 public class HiveClient {
     private static HiveClient mInstance ;
@@ -26,15 +27,15 @@ public class HiveClient {
         mInstance = null ;
     }
 
-    public IHiveConnect connect(HiveConnectOptions hiveConnectOptions) {
+    public IHiveConnect connect(HiveConnectOptions hiveConnectOptions) throws HiveException {
         HiveConnectOptions.HiveBackendType backendType = hiveConnectOptions.getBackendType();
         IHiveConnect hiveConnect = null ;
         switch (backendType){
             case HiveBackendType_IPFS:
-                hiveConnect = IPFSConnect.createInstance(hiveConnectOptions);
+                hiveConnect = IPFSConnect.createInstance((IPFSConnectOptions)hiveConnectOptions);
                 break;
             case HiveBackendType_OneDrive:
-                hiveConnect = OneDriveConnect.createInstance(hiveConnectOptions);
+                hiveConnect = OneDriveConnect.createInstance((OneDriveConnectOptions)hiveConnectOptions);
                 break;
             case HiveBackendType_ownCloud:
                 break;
@@ -48,7 +49,7 @@ public class HiveClient {
     }
 
     public int disConnect(IHiveConnect hiveConnect) {
-        hiveConnect.disConnect();
+        if (hiveConnect!=null) hiveConnect.disConnect();
         return 0;
     }
 }

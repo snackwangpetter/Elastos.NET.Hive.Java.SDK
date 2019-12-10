@@ -22,7 +22,5 @@
 
 package org.elastos.hive.result;
 
-import org.elastos.hive.result.Result;
-
 public class Void extends Result {
 }

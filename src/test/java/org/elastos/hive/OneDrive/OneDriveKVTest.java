@@ -4,6 +4,7 @@ import org.elastos.hive.Authenticator;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.IHiveConnect;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.vendors.onedrive.IHiveFile;
@@ -113,8 +114,7 @@ public class OneDriveKVTest {
     }
 
     @BeforeClass
-    public static void setUp() throws Exception {
-        LogUtil.d("2222222222222222222");
+    public static void setUp(){
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
@@ -127,12 +127,12 @@ public class OneDriveKVTest {
                 fail("Authenticator failed");
             }
         });
-//        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
-//        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
-//        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
 
-
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
+        try {
+            hiveConnect = hiveClient.connect(hiveConnectOptions);
+        } catch (HiveException e) {
+            e.printStackTrace();
+        }
 
         hiveFile = hiveConnect.createHiveFile("/bar","");
 

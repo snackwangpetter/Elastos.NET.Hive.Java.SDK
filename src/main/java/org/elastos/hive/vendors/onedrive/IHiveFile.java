@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 public interface IHiveFile {
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt);
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt , Callback<Void> callback);
-//    CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt);
 
     CompletableFuture<Void> putFileFromBuffer(String destFilename , byte[] data , boolean encrypt);
     CompletableFuture<Void> putFileFromBuffer(String destFilename , byte[] data , boolean encrypt , Callback<Void> callback);

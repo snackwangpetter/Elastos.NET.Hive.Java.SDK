@@ -15,24 +15,14 @@ public class OneDriveConnect implements IHiveConnect {
     private static OneDriveConnectOptions oneDriveConnectOptions ;
     private static AuthHelper authHelper;
 
-
-
-    private OneDriveConnect(OneDriveConnectOptions oneDriveConnectOptions){
-//        OAuthEntry oAuthEntry = new OAuthEntry(oneDriveConnectOptions.getClientId(),
-//                oneDriveConnectOptions.getScope(),oneDriveConnectOptions.getRedirectUrl());
-//
-//        if (oneDriveConnectOptions.getPersistent() == null){
-//            oneDriveConnectOptions.setPersistent(new OneDriveAuthInfoStoreImpl(HiveConnectOptions.DEFAULT_STORE_PATH));
-//        }
-//
-//        this.authHelper = new OneDriveAuthHelper(oAuthEntry,oneDriveConnectOptions.getPersistent());
+    private OneDriveConnect(){
     }
 
-    public static IHiveConnect createInstance(HiveConnectOptions hiveConnectOptions){
+    public static IHiveConnect createInstance(OneDriveConnectOptions hiveConnectOptions){
         if (null == mOneDriveConnectInstance){
-            mOneDriveConnectInstance = new OneDriveConnect((OneDriveConnectOptions) hiveConnectOptions);
+            mOneDriveConnectInstance = new OneDriveConnect();
         }
-        oneDriveConnectOptions = (OneDriveConnectOptions) hiveConnectOptions;
+        oneDriveConnectOptions = hiveConnectOptions;
         return mOneDriveConnectInstance;
     }
 
@@ -45,11 +35,7 @@ public class OneDriveConnect implements IHiveConnect {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        try {
             if (oneDriveConnectOptions.getPersistent() == null){
                 oneDriveConnectOptions.setPersistent(new OneDriveAuthInfoStoreImpl(HiveConnectOptions.DEFAULT_STORE_PATH));
             }
@@ -60,21 +46,17 @@ public class OneDriveConnect implements IHiveConnect {
                     oneDriveConnectOptions.getPersistent());
 
             authHelper.loginAsync(authenticator).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public void disConnect() {
-
     }
 
     @Override
     public void setEncryptKey(String encryptKey) {
-
     }
 
     @Override

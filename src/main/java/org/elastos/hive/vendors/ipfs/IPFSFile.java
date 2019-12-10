@@ -21,26 +21,10 @@ import retrofit2.Response;
 
 
 public class IPFSFile extends HiveFile implements IHiveIPFS {
-    String fileName ;
-    String cid ;
     IPFSRpc ipfsRpc ;
 
-    IPFSFile(String fileName , String cid , IPFSRpc ipfsRpc){
-        this.fileName = fileName ;
-        this.cid = cid ;
+    IPFSFile(IPFSRpc ipfsRpc){
         this.ipfsRpc = ipfsRpc ;
-    }
-
-    IPFSFile(String fileName , String cid){
-        this.fileName = fileName ;
-        this.cid = cid ;
-    }
-
-    private CompletableFuture createNotImpException(String msg){
-        CompletableFuture completableFuture = new CompletableFuture();
-        HiveException exception = new HiveException(msg);
-        completableFuture.completeExceptionally(exception);
-        return completableFuture;
     }
 
     private CompletableFuture<CID> doPutFile(String sorceFilename , HiveIPFSPutDataCallback hiveIPFSPutDataCallback){
@@ -60,6 +44,9 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
                     hiveIPFSPutDataCallback.callback(cid);
                 }
                 future.complete(cid);
+            }else{
+                HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
+                future.completeExceptionally(exception);
             }
         } catch (Exception e) {
             e.printStackTrace();

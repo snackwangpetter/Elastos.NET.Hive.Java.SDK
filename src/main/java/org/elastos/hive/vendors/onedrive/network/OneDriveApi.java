@@ -23,7 +23,6 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 import org.elastos.hive.vendors.onedrive.OneDriveConstance;
-import org.elastos.hive.vendors.onedrive.network.model.ClientResponse;
 import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
 import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
@@ -48,8 +47,8 @@ import retrofit2.http.Url;
 public interface OneDriveApi {
 
     //https://graph.microsoft.com/v1.0/me/
-    @GET(OneDriveConstance.ONE_DRIVE_API_BASE_URL)
-    Call<ClientResponse> getInfo();
+//    @GET(OneDriveConstance.ONE_DRIVE_API_BASE_URL)
+//    Call<ClientResponse> getInfo();
 
     @GET(OneDriveConstance.DRIVE)
     Call<DriveResponse> getDriveInfo();

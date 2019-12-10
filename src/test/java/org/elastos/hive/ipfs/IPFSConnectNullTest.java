@@ -11,31 +11,24 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
-public class IPFSConnectTest {
+public class IPFSConnectNullTest {
 
     private static IHiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
-    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[5];
+    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[1];
 
     @BeforeClass
     public static void setUp() {
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
-        hiveRpcNodes[0] = new HiveRpcNode("3.133.166.156",5001);
-        hiveRpcNodes[1] = new HiveRpcNode("13.59.79.222",5001);
-        hiveRpcNodes[2] = new HiveRpcNode("3.133.71.168",5001);
-        hiveRpcNodes[3] = new HiveRpcNode("107.191.44.124",5001);
-        hiveRpcNodes[4] = new HiveRpcNode("127.0.0.1",5001);
+        hiveRpcNodes[0] = null;
     }
 
 
-    @Test
+    @Test(expected = HiveException.class)
     public void testConnect() throws HiveException {
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
         hiveConnect = hiveClient.connect(hiveConnectOptions);
-        assertNotNull(hiveConnect);
     }
 
     @AfterClass

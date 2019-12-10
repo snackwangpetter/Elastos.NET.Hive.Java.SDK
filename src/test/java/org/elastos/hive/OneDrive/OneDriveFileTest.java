@@ -48,8 +48,6 @@ public class OneDriveFileTest {
     @Test
     public void testPutFile() {
         String testFilepath = System.getProperty("user.dir")+"/src/resources/org/elastos/hive/test.txt";
-
-//        String testFilepath = "/Users/wangran/tmp/tmp/test.txt";
         try {
             hiveFile.putFile("hi.txt",testFilepath,false).get();
         } catch (InterruptedException e) {
@@ -57,8 +55,6 @@ public class OneDriveFileTest {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Test
