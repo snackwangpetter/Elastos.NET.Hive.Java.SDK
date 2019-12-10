@@ -22,6 +22,8 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.result.Result;
+
 /**
  * Callback result in Hive SDK
  */

@@ -1,4 +1,4 @@
 package org.elastos.hive;
 
-public class ErrorCode {
+public class HiveFile {
 }

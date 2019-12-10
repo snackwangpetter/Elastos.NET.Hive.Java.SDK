@@ -20,47 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.result;
 
-/**
- * Elastos Hive SDK configuration for IPFS.<br>
- * All app information should match the information in your app portal
- */
-public class IPFSEntry {
-	private String uid;
-	private final String[] rpcAddrs;
-
-	/**
-	 * IPFSEntry Constructor
-	 * @param uid User uid
-	 * @param rpcAddrs IPFS rpc address list
-	 */
-	public IPFSEntry(String uid, String[] rpcAddrs) {
-		this.uid = uid;
-		this.rpcAddrs = rpcAddrs;
-	}
-
-	/**
-	 * Set the unique uid.
-	 * @param uid User uid .The unique uid for current user.
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-
-	/**
-	 * Get current unique uid.
-	 * @return Current unique uid.
-	 */
-	public String getUid() {
-		return uid;
-	}
-
-	/**
-	 * Get IPFS rpc address list .
-	 * @return User IPFS rpc address list .
-	 */
-	public String[] getRcpAddrs() {
-		return rpcAddrs;
-	}
+public class Result {
 }

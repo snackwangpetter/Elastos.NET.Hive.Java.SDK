@@ -20,18 +20,16 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.ipfs;
+package org.elastos.hive.result;
 
-import org.elastos.hive.Result;
+public class CID extends Result {
+	private final String cid;
 
-class IPFSHash extends Result {
-	private final String hashValue;
-
-	IPFSHash(String hash) {
-		this.hashValue = hash;
+	public CID(String cid) {
+		this.cid = cid;
 	}
 
-	String getValue() {
-		return hashValue;
+	public String getCid() {
+		return cid;
 	}
 }

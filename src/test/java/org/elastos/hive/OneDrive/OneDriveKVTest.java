@@ -5,8 +5,9 @@ import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.IHiveConnect;
-import org.elastos.hive.IHiveFile;
-import org.elastos.hive.Void;
+import org.elastos.hive.result.Data;
+import org.elastos.hive.vendors.onedrive.IHiveFile;
+import org.elastos.hive.result.Void;
 import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 import org.junit.AfterClass;
@@ -59,9 +60,9 @@ public class OneDriveKVTest {
     @Test
     public void testGetValue() {
         try {
-            ArrayList<byte[]> arrayDatas = hiveFile.getValue("KVT",false).get();
+            ArrayList<Data> arrayDatas = hiveFile.getValue("KVT",false).get();
             for (int i = 0 ; i < arrayDatas.size() ; i++){
-                byte[] data = arrayDatas.get(i);
+                byte[] data = arrayDatas.get(i).getData();
                 LogUtil.d("result = "+new String(data));
             }
         } catch (InterruptedException e) {
@@ -75,10 +76,10 @@ public class OneDriveKVTest {
     public void testGetValueAsync() {
         CompletableFuture future = hiveFile.getValue("KVT", false, new IHiveFile.HiveKeyValuesIterateCallback() {
             @Override
-            public boolean callback(String key, byte[] value, int length) {
+            public boolean callback(String key, Data value, int length) {
                 LogUtil.d("===============");
                 LogUtil.d("key = "+key);
-                LogUtil.d("value = "+new String(value));
+                LogUtil.d("value = "+new String(value.getData()));
                 LogUtil.d("length = "+length);
                 LogUtil.d("===============");
                 return false;
@@ -113,24 +114,22 @@ public class OneDriveKVTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
+        LogUtil.d("2222222222222222222");
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
-        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(new Authenticator() {
-            @Override
-            public void requestAuthentication(String requestUrl) {
-                try {
-                    Desktop.getDesktop().browse(new URI(requestUrl));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    fail("Authenticator failed");
-                }
+        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(APPID,SCOPE,REDIRECTURL, requestUrl -> {
+            try {
+                Desktop.getDesktop().browse(new URI(requestUrl));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                fail("Authenticator failed");
             }
         });
-        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
-        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
-        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
 
 
         hiveConnect = hiveClient.connect(hiveConnectOptions);

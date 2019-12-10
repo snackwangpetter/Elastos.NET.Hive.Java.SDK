@@ -2,8 +2,9 @@ package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.HiveFile;
 import org.elastos.hive.IHiveConnect;
-import org.elastos.hive.IHiveFile;
+import org.elastos.hive.vendors.onedrive.OneDriveFile;
 
 public class IPFSConnect implements IHiveConnect {
     private static IPFSConnect mIPFSConnectInstance ;
@@ -50,7 +51,17 @@ public class IPFSConnect implements IHiveConnect {
     }
 
     @Override
-    public IHiveFile createHiveFile(String filename, String key) {
-        return new IPFSFile(filename,key,ipfsRpc);
+    public <T extends HiveFile> T createHiveFile(String filename, String cid) {
+        return (T) new IPFSFile("","",ipfsRpc);
     }
+
+//    @Override
+//    public IHiveFile createHiveFile(String filename, String key) {
+//        return new IPFSFile(filename,key,ipfsRpc);
+//    }
+
+
+//    public <T extends HiveFile> T createHiveFile(String filename) {
+//        return new IPFSFile("","",ipfsRpc);
+//    }
 }

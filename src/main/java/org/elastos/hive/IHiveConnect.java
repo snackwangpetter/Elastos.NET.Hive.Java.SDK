@@ -4,5 +4,5 @@ public interface IHiveConnect {
     void connect(Authenticator authenticator);
     void disConnect();
     void setEncryptKey(String encryptKey);
-    IHiveFile createHiveFile(String filename , String cid);
+    <T extends HiveFile> T createHiveFile(String filename , String cid);
 }

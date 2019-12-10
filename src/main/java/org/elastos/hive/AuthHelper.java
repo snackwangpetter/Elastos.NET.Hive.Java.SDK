@@ -22,6 +22,8 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.result.Void;
+
 import java.util.concurrent.CompletableFuture;
 
 /**

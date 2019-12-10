@@ -18,7 +18,7 @@ public class IPFSConnectTest {
 
     private static IHiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
-    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[3];
+    private static HiveRpcNode[] hiveRpcNodes = new HiveRpcNode[1];
 
     @Test
     public void testGetInstance() {
@@ -30,9 +30,10 @@ public class IPFSConnectTest {
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
-        hiveRpcNodes[0] = new HiveRpcNode("3.133.166.156",5001);
-        hiveRpcNodes[1] = new HiveRpcNode("13.59.79.222",5001);
-        hiveRpcNodes[2] = new HiveRpcNode("3.133.71.168",5001);
+//        hiveRpcNodes[0] = new HiveRpcNode("3.133.166.156",5001);
+//        hiveRpcNodes[1] = new HiveRpcNode("13.59.79.222",5001);
+//        hiveRpcNodes[2] = new HiveRpcNode("3.133.71.168",5001);
+        hiveRpcNodes[0] = new HiveRpcNode("127.0.0.1",5001);
 
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
         hiveConnect = hiveClient.connect(hiveConnectOptions);

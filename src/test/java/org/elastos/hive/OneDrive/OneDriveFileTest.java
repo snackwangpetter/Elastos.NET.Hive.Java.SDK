@@ -5,11 +5,14 @@ import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.IHiveConnect;
-import org.elastos.hive.IHiveFile;
-import org.elastos.hive.Length;
-import org.elastos.hive.Void;
+import org.elastos.hive.result.Data;
+import org.elastos.hive.util.TestUtils;
+import org.elastos.hive.vendors.onedrive.IHiveFile;
+import org.elastos.hive.result.Length;
+import org.elastos.hive.result.Void;
 import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
+import org.elastos.hive.vendors.onedrive.OneDriveFile;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +38,7 @@ public class OneDriveFileTest {
 
     private static IHiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
-    private static IHiveFile hiveFile ;
+    private static OneDriveFile hiveFile ;
 
     @Test
     public void testGetInstance() {
@@ -65,7 +68,7 @@ public class OneDriveFileTest {
 
         CompletableFuture future = hiveFile.putFileFromBuffer("hi2.txt",data ,false);
 
-        waitFinish(future);
+        TestUtils.waitFinish(future);
 
     }
 
@@ -95,9 +98,9 @@ public class OneDriveFileTest {
     @Test
     public void testGetFileBuffer(){
         try {
-            byte[] bytes = hiveFile.getFileToBuffer("hi.txt",false,-1).get();
+            Data data = hiveFile.getFileToBuffer("hi.txt",false).get();
 
-            String str = new String(bytes);
+            String str = new String(data.getData());
             LogUtil.d("result = "+str);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -158,30 +161,28 @@ public class OneDriveFileTest {
             }
         });
 
-        waitFinish(future);
+        TestUtils.waitFinish(future);
     }
 
 
     @BeforeClass
     public static void setUp() throws Exception {
+        LogUtil.d("11111111111111111111");
         HiveClientOptions hiveOptions = new HiveClientOptions();
         hiveClient = HiveClient.createInstance(hiveOptions);
 
-        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(new Authenticator() {
-            @Override
-            public void requestAuthentication(String requestUrl) {
-                try {
-                    Desktop.getDesktop().browse(new URI(requestUrl));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    fail("Authenticator failed");
-                }
+        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(APPID,SCOPE,REDIRECTURL, requestUrl -> {
+            try {
+                Desktop.getDesktop().browse(new URI(requestUrl));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                fail("Authenticator failed");
             }
         });
-        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
-        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
-        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setClientId(APPID);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setScope(SCOPE);
+//        ((OneDriveConnectOptions) hiveConnectOptions).setRedirectUrl(REDIRECTURL);
 
 
         hiveConnect = hiveClient.connect(hiveConnectOptions);
@@ -196,17 +197,6 @@ public class OneDriveFileTest {
     public static void tearDown() throws Exception {
         hiveClient.disConnect(hiveConnect);
         hiveClient.close();
-    }
-
-    private void waitFinish(CompletableFuture future){
-        while(!future.isDone()){
-            try {
-                LogUtil.d("1000");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void createTestRootPath(){

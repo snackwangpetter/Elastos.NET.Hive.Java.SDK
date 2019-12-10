@@ -8,7 +8,8 @@ public class HiveError {
     public static final String GET_FILE_LENGTH_ERROR = "Get file length error .";
     public static final String GET_FILE_ERROR = "Get file error .";
     public static final String PUT_FILE_ERROR = "Put file error .";
-    public static final String PUT_Buffer_ERROR = "Put buffer error .";
-
+    public static final String PUT_BUFFER_ERROR = "Put buffer error .";
+    public static final String GET_BUFFER_ERROR = "Get buffer error .";
+    public static final String DEL_FILE_ERROR = "Delete file error .";
 
 }

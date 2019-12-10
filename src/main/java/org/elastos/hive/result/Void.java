@@ -20,44 +20,9 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.ipfs.network.model;
+package org.elastos.hive.result;
 
-public class ResolveResponse {
+import org.elastos.hive.result.Result;
 
-    private String Message;
-    private int Code;
-    private String Type;
-    private String Path;
-
-    public String getMessage() {
-        return Message;
-    }
-
-    public void setMessage(String Message) {
-        this.Message = Message;
-    }
-
-    public int getCode() {
-        return Code;
-    }
-
-    public void setCode(int Code) {
-        this.Code = Code;
-    }
-
-    public String getType() {
-        return Type;
-    }
-
-    public void setType(String Type) {
-        this.Type = Type;
-    }
-
-    public String getPath() {
-        return Path;
-    }
-
-    public void setPath(String Path) {
-        this.Path = Path;
-    }
+public class Void extends Result {
 }

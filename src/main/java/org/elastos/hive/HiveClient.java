@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.ipfs.IPFSConnect;
 import org.elastos.hive.vendors.onedrive.OneDriveConnect;
 
