@@ -3,7 +3,9 @@ package org.elastos.hive.vendors.onedrive;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.result.Data;
+import org.elastos.hive.result.FileList;
 import org.elastos.hive.result.Length;
+import org.elastos.hive.result.ValueList;
 import org.elastos.hive.result.Void;
 
 import java.util.ArrayList;
@@ -28,8 +30,8 @@ public interface IHiveFile {
     CompletableFuture<Void> deleteFile(String filename);
     CompletableFuture<Void> deleteFile(String filename , Callback callback);
 
-    CompletableFuture<String[]> listFile();
-    CompletableFuture<String[]> listFile(HiveFileIteraterCallback hiveFileIteraterCallback);
+    CompletableFuture<FileList> listFile();
+    CompletableFuture<FileList> listFile(Callback<FileList> callback);
 
     CompletableFuture<Void> putValue(String key , byte[] value , boolean encrypt);
     CompletableFuture<Void> putValue(String key , byte[] value , boolean encrypt , Callback<Void> callback);
@@ -38,16 +40,11 @@ public interface IHiveFile {
     CompletableFuture<Void> setValue(String key , byte[] value , boolean encrypt);
     CompletableFuture<Void> setValue(String key , byte[] value , boolean encrypt , Callback<Void> callback);
 
-    CompletableFuture<ArrayList<Data>> getValue(String key , boolean decrypt);
-    CompletableFuture<Void> getValue(String key , boolean decrypt , HiveKeyValuesIterateCallback hiveKeyValuesIterateCallback);
+    CompletableFuture<ValueList> getValue(String key , boolean decrypt);
+    CompletableFuture<ValueList> getValue(String key , boolean decrypt , Callback<ValueList> callback);
 
     CompletableFuture<Void> deleteValueFromKey(String key);
     CompletableFuture<Void> deleteValueFromKey(String key , Callback<Void> callback);
-
-
-    interface HiveFileIteraterCallback{
-        boolean callback(String filename);
-    }
 
     interface HiveKeyValuesIterateCallback{
         boolean callback(String key , Data value , int length);

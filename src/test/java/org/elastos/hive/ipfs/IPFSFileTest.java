@@ -1,5 +1,6 @@
 package org.elastos.hive.ipfs;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
@@ -9,6 +10,7 @@ import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.Length;
 
+import org.elastos.hive.result.Result;
 import org.elastos.hive.util.Md5CaculateUtil;
 import org.elastos.hive.util.TestUtils;
 import org.elastos.hive.utils.LogUtil;
@@ -16,6 +18,7 @@ import org.elastos.hive.vendors.HiveRpcNode;
 import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.ipfs.IPFSFile;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -59,9 +62,6 @@ public class IPFSFileTest {
         hiveRpcNodes[3] = new HiveRpcNode("3.133.71.168",5001);
         hiveRpcNodes[4] = new HiveRpcNode("107.191.44.124",5001);
 
-
-//        hiveRpcNodes[0] = new HiveRpcNode("127.0.0.1",5001);
-
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
         try {
             hiveConnect = hiveClient.connect(hiveConnectOptions);
@@ -89,8 +89,7 @@ public class IPFSFileTest {
     public void testPutFile() {
         if (hiveFile!=null){
             try {
-                CompletableFuture<CID> future = hiveFile.putFile(TEST_FILE_PATH,false);
-                CID cid = future.get();
+                CID cid = hiveFile.putFile(TEST_FILE_PATH,false).get();
                 assertEquals(EXPECTED_CID.getCid() , cid.getCid());
             } catch (InterruptedException e) {
                 assertNull(e);
@@ -105,10 +104,19 @@ public class IPFSFileTest {
     @Test
     public void testPutFileAsync() {
         if (hiveFile!=null) {
-            CompletableFuture future = hiveFile.putFile(TEST_FILE_PATH, false, cid -> {
-                LogUtil.d("result == " + cid.getCid());
-                assertEquals(EXPECTED_CID.getCid(), cid.getCid());
+            CompletableFuture future = hiveFile.putFile(TEST_FILE_PATH, false, new Callback<CID>() {
+                @Override
+                public void onError(HiveException e) {
+
+                }
+
+                @Override
+                public void onSuccess(CID body) {
+                    LogUtil.d("result == " + body.getCid());
+                    assertEquals(EXPECTED_CID.getCid(), body.getCid());
+                }
             });
+
             TestUtils.waitFinish(future);
             assertFalse(future.isCompletedExceptionally());
         }
@@ -134,9 +142,17 @@ public class IPFSFileTest {
     @Test
     public void testPutBufferAsync() {
         if (hiveFile!=null) {
-            CompletableFuture future = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(), false, cid -> {
-                LogUtil.d("result == " + cid.getCid());
-                assertEquals(EXPECTED_CID.getCid(), cid.getCid());
+            CompletableFuture future = hiveFile.putFileFromBuffer(EXPECTED_STR.getBytes(), false, new Callback<CID>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(CID body) {
+                    LogUtil.d("result == " + body.getCid());
+                    assertEquals(EXPECTED_CID.getCid(), body.getCid());
+                }
             });
             TestUtils.waitFinish(future);
             assertFalse(future.isCompletedExceptionally());
@@ -162,10 +178,19 @@ public class IPFSFileTest {
 
     @Test
     public void testGetFileLengthAsync() {
-        CompletableFuture future = hiveFile.getFileLength(TEST_CID, length -> {
-            LogUtil.d("length = "+length.getLength());
-            assertEquals(EXPECTED_LENGTH.getLength(),length.getLength());
+        CompletableFuture future = hiveFile.getFileLength(TEST_CID, new Callback<Length>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Length body) {
+                LogUtil.d("length = "+body.getLength());
+                assertEquals(EXPECTED_LENGTH.getLength(),body.getLength());
+            }
         });
+
         TestUtils.waitFinish(future);
         assertFalse(future.isCompletedExceptionally());
     }
@@ -196,14 +221,22 @@ public class IPFSFileTest {
 
     @Test
     public void testGetFileAsync() {
-        CompletableFuture future = hiveFile.getFile(TEST_CID, false, STORE_FILE_PATH, length -> {
-            String actualMD5 = Md5CaculateUtil.getFileMD5(STORE_FILE_PATH) ;
+        CompletableFuture future = hiveFile.getFile(TEST_CID, false, STORE_FILE_PATH, new Callback<Length>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
 
-            assertEquals(EXPECTED_LENGTH.getLength(),length.getLength());
-            assertEquals(EXPECTED_FILE_MD5, actualMD5);
+            @Override
+            public void onSuccess(Length body) {
+                String actualMD5 = Md5CaculateUtil.getFileMD5(STORE_FILE_PATH);
 
-            LogUtil.d("actualMD5="+actualMD5);
-            LogUtil.d("length="+length.getLength());
+                assertEquals(EXPECTED_LENGTH.getLength(), body.getLength());
+                assertEquals(EXPECTED_FILE_MD5, actualMD5);
+
+                LogUtil.d("actualMD5=" + actualMD5);
+                LogUtil.d("length=" + body.getLength());
+            }
         });
 
         TestUtils.waitFinish(future);
@@ -214,11 +247,7 @@ public class IPFSFileTest {
     public void testGetBuffer() {
         try {
             Data data = hiveFile.getFileToBuffer(TEST_CID,false).get();
-
-            String dataString = new String(data.getData()) ;
-            assertEquals(EXPECTED_STR,dataString);
-
-            LogUtil.d("data="+dataString);
+            Assert.assertArrayEquals(EXPECTED_STR.getBytes(),data.getData());
         } catch (InterruptedException e) {
             assertNull(e);
             e.printStackTrace();
@@ -231,11 +260,17 @@ public class IPFSFileTest {
 
     @Test
     public void testGetBufferAsync() {
-        CompletableFuture future = hiveFile.getFileToBuffer(TEST_CID, false, data -> {
-            String dataString = new String(data.getData()) ;
-            assertEquals(EXPECTED_STR,dataString);
+        CompletableFuture future = hiveFile.getFileToBuffer(TEST_CID, false, new Callback<Data>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
 
-            LogUtil.d("data="+dataString);
+            @Override
+            public void onSuccess(Data body) {
+                assertNotNull(body);
+                Assert.assertArrayEquals(EXPECTED_STR.getBytes(),body.getData());
+            }
         });
         TestUtils.waitFinish(future);
         assertFalse(future.isCompletedExceptionally());

@@ -11,5 +11,10 @@ public class HiveError {
     public static final String PUT_BUFFER_ERROR = "Put buffer error .";
     public static final String GET_BUFFER_ERROR = "Get buffer error .";
     public static final String DEL_FILE_ERROR = "Delete file error .";
+    public static final String GET_VALUE_ERROR = "Get value error .";
+
+    public static final String FILE_ALREADY_EXIST_ERROR = "File already exist error .";
+    public static final String ITEM_NOT_FOUND = "Item not found.";
+
 
 }

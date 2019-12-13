@@ -1,12 +1,13 @@
 package org.elastos.hive.OneDrive;
 
-import org.elastos.hive.Authenticator;
+import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IHiveConnect;
 import org.elastos.hive.result.Data;
+import org.elastos.hive.result.ValueList;
 import org.elastos.hive.vendors.onedrive.IHiveFile;
 import org.elastos.hive.result.Void;
 import org.elastos.hive.utils.LogUtil;
@@ -25,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class OneDriveKVTest {
@@ -39,6 +39,12 @@ public class OneDriveKVTest {
     private static HiveClient hiveClient ;
     private static IHiveFile hiveFile ;
 
+//    private byte[]
+    private String value1 = "value1";
+    private String value2 = "value2";
+    private String value3 = "value3";
+
+
     @Test
     public void testGetInstance() {
         assertNotNull(hiveFile);
@@ -49,8 +55,8 @@ public class OneDriveKVTest {
         Void future = null;
         try {
 
-            byte[] data = "test".getBytes() ;
-            future = hiveFile.putValue("KVT",data,false).get();
+//            byte[] data = "test".getBytes() ;
+            future = hiveFile.putValue("KVT",value1.getBytes(),false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -61,7 +67,8 @@ public class OneDriveKVTest {
     @Test
     public void testGetValue() {
         try {
-            ArrayList<Data> arrayDatas = hiveFile.getValue("KVT",false).get();
+            ValueList valueList = hiveFile.getValue("KVT",false).get();
+            ArrayList<Data> arrayDatas = valueList.getList();
             for (int i = 0 ; i < arrayDatas.size() ; i++){
                 byte[] data = arrayDatas.get(i).getData();
                 LogUtil.d("result = "+new String(data));
@@ -75,15 +82,21 @@ public class OneDriveKVTest {
 
     @Test
     public void testGetValueAsync() {
-        CompletableFuture future = hiveFile.getValue("KVT", false, new IHiveFile.HiveKeyValuesIterateCallback() {
+        CompletableFuture future = hiveFile.getValue("KVT", false, new Callback<ValueList>() {
             @Override
-            public boolean callback(String key, Data value, int length) {
+            public void onError(HiveException e) {
+
+            }
+
+            @Override
+            public void onSuccess(ValueList body) {
+                ArrayList list = body.getList();
+
                 LogUtil.d("===============");
-                LogUtil.d("key = "+key);
-                LogUtil.d("value = "+new String(value.getData()));
-                LogUtil.d("length = "+length);
+                LogUtil.d("key = "+list);
+//                LogUtil.d("value = "+new String(value.getData()));
+//                LogUtil.d("length = "+length);
                 LogUtil.d("===============");
-                return false;
             }
         });
         waitFinish(future);
@@ -133,12 +146,8 @@ public class OneDriveKVTest {
         } catch (HiveException e) {
             e.printStackTrace();
         }
-
         hiveFile = hiveConnect.createHiveFile("/bar","");
-
     }
-
-
 
     @AfterClass
     public static void tearDown() throws Exception {
@@ -154,23 +163,6 @@ public class OneDriveKVTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void createTestRootPath(){
-    }
-
-    private void getContentFromFile(String filepath){
-        File file = new File(filepath);
-        try {
-            FileInputStream out = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(out);
-            int ch = 0;
-            while ((ch = isr.read()) != -1) {
-                System.out.print((char) ch);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
         }
     }
 }

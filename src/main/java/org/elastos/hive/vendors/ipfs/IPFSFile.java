@@ -1,5 +1,6 @@
 package org.elastos.hive.vendors.ipfs;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.HiveError;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.HiveFile;
@@ -22,59 +23,55 @@ import retrofit2.Response;
 
 public class IPFSFile extends HiveFile implements IHiveIPFS {
     IPFSRpc ipfsRpc ;
-
     IPFSFile(IPFSRpc ipfsRpc){
         this.ipfsRpc = ipfsRpc ;
     }
 
-    private CompletableFuture<CID> doPutFile(String sorceFilename , HiveIPFSPutDataCallback hiveIPFSPutDataCallback){
+    private CompletableFuture<CID> doPutFile(String sorceFilename , Callback<CID> callback){
         CompletableFuture future = new CompletableFuture() ;
         if (!checkConnection(future)) return future;
         try {
             MultipartBody.Part requestBody = createFileRequestBody(sorceFilename);
             Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
-            if (response == null){
-                future.completeExceptionally(new HiveException(HiveError.PUT_FILE_ERROR));
+            if (response == null || response.code() != 200){
+                HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
                 return future;
             }
-            if (response.code() == 200){
-                AddFileResponse addFileResponse = (AddFileResponse) response.body();
-                CID cid = new CID(addFileResponse.getHash());
-                if (hiveIPFSPutDataCallback != null){
-                    hiveIPFSPutDataCallback.callback(cid);
-                }
-                future.complete(cid);
-            }else{
-                HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
-                future.completeExceptionally(exception);
-            }
+            AddFileResponse addFileResponse = (AddFileResponse) response.body();
+            CID cid = new CID(addFileResponse.getHash());
+            if (callback != null) callback.onSuccess(cid);
+            future.complete(cid);
         } catch (Exception e) {
             e.printStackTrace();
-            future.completeExceptionally(new HiveException(HiveError.PUT_FILE_ERROR));
+            HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
+            if (callback != null) callback.onError(exception);
+            future.completeExceptionally(exception);
         }
         return future;
     }
 
-    private CompletableFuture<CID> doPutBuffer(byte[] data , HiveIPFSPutDataCallback hiveIPFSPutDataCallback){
+    private CompletableFuture<CID> doPutBuffer(byte[] data , Callback<CID> callback){
         CompletableFuture future = new CompletableFuture();
         if (!checkConnection(future)) return future;
         try {
             MultipartBody.Part requestBody = createBufferRequestBody(data);
             Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
-            if (response == null){
-                future.completeExceptionally(new HiveException(HiveError.PUT_BUFFER_ERROR));
+            if (response == null || response.code() != 200){
+                HiveException exception = new HiveException(HiveError.PUT_BUFFER_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
                 return future;
             }
-            if (response.code() == 200){
-                AddFileResponse addFileResponse = (AddFileResponse) response.body();
-                CID cid = new CID(addFileResponse.getHash());
-                if (hiveIPFSPutDataCallback!=null){
-                    hiveIPFSPutDataCallback.callback(cid);
-                }
-                future.complete(cid);
-            }
+            AddFileResponse addFileResponse = (AddFileResponse) response.body();
+            CID cid = new CID(addFileResponse.getHash());
+            if (callback!=null) callback.onSuccess(cid);
+            future.complete(cid);
         } catch (Exception e) {
-            future.completeExceptionally(new HiveException(HiveError.PUT_BUFFER_ERROR));
+            HiveException exception = new HiveException(HiveError.PUT_BUFFER_ERROR) ;
+            if (callback != null) callback.onError(exception);
+            future.completeExceptionally(exception);
         }
 
         return future;
@@ -99,7 +96,7 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
         return body ;
     }
 
-    private CompletableFuture<Length> doGetFileLength(CID cid ,HiveIPFSGetLengthCallback hiveGetLengthCallback){
+    private CompletableFuture<Length> doGetFileLength(CID cid ,Callback<Length> callback){
         CompletableFuture<Length> future = new CompletableFuture();
         if (!checkConnection(future)) return future;
         String hash ;
@@ -110,8 +107,10 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
         } catch (Exception e) {
             future.completeExceptionally(new HiveException(HiveError.GET_FILE_LENGTH_ERROR));
         }
-        if (response == null){
-            future.completeExceptionally(new HiveException(HiveError.GET_FILE_LENGTH_ERROR));
+        if (response == null || response.code() != 200){
+            HiveException exception = new HiveException(HiveError.GET_FILE_LENGTH_ERROR);
+            if (callback!=null) callback.onError(exception);
+            future.completeExceptionally(exception);
             return future;
         }
         ListFileResponse listFileResponse = (ListFileResponse) response.body();
@@ -125,30 +124,30 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
                 break;//if result only one
             }
             Length length = new Length(size);
-            if (hiveGetLengthCallback!=null){
-                hiveGetLengthCallback.callback(length);
-            }
+            if (callback!=null) callback.onSuccess(length);
             future.complete(length);
         }else{
-            future.completeExceptionally(new HiveException(HiveError.GET_FILE_LENGTH_ERROR));
+            HiveException exception = new HiveException(HiveError.GET_FILE_LENGTH_ERROR);
+            callback.onError(exception);
+            future.completeExceptionally(exception);
         }
         return future;
     }
 
-    private CompletableFuture<Length> doCatFile(CID cid,String storeFilepath ,HiveIPFSStoreFileCallback hiveIPFSStoreFileCallback){
+    private CompletableFuture<Length> doCatFile(CID cid,String storeFilepath ,Callback<Length> callback){
         CompletableFuture<Length> future = new CompletableFuture() ;
         if (!checkConnection(future)) return future;
         try {
             Response response = getFileOrBuffer(cid.getCid());
-            if (response == null){
-                future.completeExceptionally(new HiveException(HiveError.GET_FILE_ERROR));
+            if (response == null || response.code()!=200){
+                HiveException exception = new HiveException(HiveError.GET_FILE_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
                 return future ;
             }
             long length = ResponseHelper.saveFileFromResponse(storeFilepath,response);
             Length lengthObj = new Length(length);
-            if (hiveIPFSStoreFileCallback!=null){
-                hiveIPFSStoreFileCallback.callback(lengthObj);
-            }
+            if (callback!=null) callback.onSuccess(lengthObj);
             future.complete(lengthObj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,7 +155,7 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
         return future;
     }
 
-    private CompletableFuture<Data> doGetBuffer(CID cid , HiveIPFSGetDataCallback hiveIPFSGetDataCallback){
+    private CompletableFuture<Data> doGetBuffer(CID cid , Callback<Data> callback){
         CompletableFuture<Data> future = new CompletableFuture();
         if (!checkConnection(future)) return future;
         try {
@@ -164,11 +163,10 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
             if (response!=null){
                 byte[] buffer = ResponseHelper.getBuffer(response);
                 Data data = new Data(buffer);
-                if (hiveIPFSGetDataCallback != null){
-                    hiveIPFSGetDataCallback.callback(data);
-                }
+                if (callback != null) callback.onSuccess(data);
                 future.complete(data);
             }else{
+
                 future.completeExceptionally(new HiveException(HiveError.GET_FILE_ERROR));
             }
         } catch (Exception e) {
@@ -203,8 +201,8 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
     }
 
     @Override
-    public CompletableFuture<CID> putFile(String absPath, boolean encrypt, HiveIPFSPutDataCallback hiveIPFSPutDataCallback) {
-        return doPutFile(absPath , hiveIPFSPutDataCallback);
+    public CompletableFuture<CID> putFile(String absPath, boolean encrypt, Callback<CID> callback) {
+        return doPutFile(absPath , callback);
     }
 
     @Override
@@ -213,8 +211,8 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
     }
 
     @Override
-    public CompletableFuture<CID> putFileFromBuffer(byte[] data, boolean encrypt, HiveIPFSPutDataCallback hiveIPFSPutDataCallback) {
-        return doPutBuffer(data , hiveIPFSPutDataCallback);
+    public CompletableFuture<CID> putFileFromBuffer(byte[] data, boolean encrypt, Callback<CID> callback) {
+        return doPutBuffer(data , callback);
     }
 
     @Override
@@ -223,8 +221,8 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
     }
 
     @Override
-    public CompletableFuture<Length> getFileLength(CID cid, HiveIPFSGetLengthCallback hiveGetLengthCallback) {
-        return doGetFileLength(cid , hiveGetLengthCallback);
+    public CompletableFuture<Length> getFileLength(CID cid, Callback<Length> callback) {
+        return doGetFileLength(cid , callback);
     }
 
     @Override
@@ -233,8 +231,8 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
     }
 
     @Override
-    public CompletableFuture<Data> getFileToBuffer(CID cid, boolean decrypt, HiveIPFSGetDataCallback hiveIPFSGetDataCallback) {
-        return doGetBuffer(cid , hiveIPFSGetDataCallback);
+    public CompletableFuture<Data> getFileToBuffer(CID cid, boolean decrypt, Callback<Data> callback) {
+        return doGetBuffer(cid , callback);
     }
 
     @Override
@@ -243,9 +241,7 @@ public class IPFSFile extends HiveFile implements IHiveIPFS {
     }
 
     @Override
-    public CompletableFuture<Length> getFile(CID cid, boolean decrypt, String storeAbsPath, HiveIPFSStoreFileCallback hiveIPFSStoreFileCallback) {
-        return doCatFile(cid,storeAbsPath , hiveIPFSStoreFileCallback);
+    public CompletableFuture<Length> getFile(CID cid, boolean decrypt, String storeAbsPath, Callback<Length> callback) {
+        return doCatFile(cid,storeAbsPath , callback);
     }
-
-
 }

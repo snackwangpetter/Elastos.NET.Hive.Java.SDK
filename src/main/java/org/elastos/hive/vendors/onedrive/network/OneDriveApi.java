@@ -50,38 +50,38 @@ public interface OneDriveApi {
 //    @GET(OneDriveConstance.ONE_DRIVE_API_BASE_URL)
 //    Call<ClientResponse> getInfo();
 
-    @GET(OneDriveConstance.DRIVE)
-    Call<DriveResponse> getDriveInfo();
-
-    @GET(OneDriveConstance.DRIVE+"/{path}")
-    Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
+//    @GET(OneDriveConstance.DRIVE)
+//    Call<DriveResponse> getDriveInfo();
+//
+//    @GET(OneDriveConstance.DRIVE+"/{path}")
+//    Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
 
     @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
     Call<FileOrDirPropResponse> createFile(@Path("path") String path);
 
-    @POST(OneDriveConstance.DRIVE+"/{path}")
-    Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
+//    @POST(OneDriveConstance.DRIVE+"/{path}")
+//    Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
 
     @GET(OneDriveConstance.DRIVE+"/root:/{path}")
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
     
-    @GET(OneDriveConstance.DRIVE+"/root")
-    Call<FileOrDirPropResponse> getRootDirectoryInfo();
+//    @GET(OneDriveConstance.DRIVE+"/root")
+//    Call<FileOrDirPropResponse> getRootDirectoryInfo();
 
-    @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
+//    @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
+//    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
-    @POST(OneDriveConstance.DRIVE+"/root:{path}:/copy")
-    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
+//    @POST(OneDriveConstance.DRIVE+"/root:{path}:/copy")
+//    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
     @DELETE(OneDriveConstance.DRIVE+"/root:{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
 
-    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<FileOrDirPropResponse> getDirFromDir(@Path("path") String path);
-
-    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<FileOrDirPropResponse> getFileFromDir(@Path("path") String path);
+//    @GET(OneDriveConstance.DRIVE+"/root:{path}")
+//    Call<FileOrDirPropResponse> getDirFromDir(@Path("path") String path);
+//
+//    @GET(OneDriveConstance.DRIVE+"/root:{path}")
+//    Call<FileOrDirPropResponse> getFileFromDir(@Path("path") String path);
 
     @GET(OneDriveConstance.DRIVE+"/root:{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
@@ -95,10 +95,10 @@ public interface OneDriveApi {
     @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
 
-    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")
-    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
+//    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")
+//    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
 
-    @PUT()
-    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
-    		, @Header("Content-Range") String range, @Body RequestBody body);
+//    @PUT()
+//    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
+//    		, @Header("Content-Range") String range, @Body RequestBody body);
 }

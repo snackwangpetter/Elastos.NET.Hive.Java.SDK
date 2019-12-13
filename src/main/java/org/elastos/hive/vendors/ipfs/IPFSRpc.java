@@ -41,14 +41,6 @@ public class IPFSRpc {
         }
     }
 
-//    void CheckReachable(){
-//
-//    }
-//
-//    void markNodeUnreachable(){
-//
-//    }
-
     HiveRpcNode getCurrentNode(){
         return mHiveRpcNode;
     }
@@ -59,10 +51,6 @@ public class IPFSRpc {
         }
         return true ;
     }
-
-//    void close(){
-//
-//    }
 
     boolean checkConnect(HiveRpcNode hiveRpcNode) throws HiveException {
         if (hiveRpcNode == null){
