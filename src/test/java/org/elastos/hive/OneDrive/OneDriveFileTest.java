@@ -58,8 +58,31 @@ public class OneDriveFileTest {
     private static OneDriveFile hiveFile ;
 
     @Test
-    public void test_00_GetInstance() {
-        assertNotNull(hiveFile);
+    public void test_00_Prepare() {
+        String[] result = null;
+        try {
+            FileList fileList = hiveFile.listFile().get();
+            result = fileList.getList();
+            for (int i = 0 ; i<result.length ; i++){
+                LogUtil.d("file = "+result[i]);
+                assertNotNull(result[i]);
+            }
+            if (result==null || result.length<1) return;
+
+            for (String name :result){
+                hiveFile.deleteFile(name).get();
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            assertNull(e);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+
+
+
     }
 
     @Test

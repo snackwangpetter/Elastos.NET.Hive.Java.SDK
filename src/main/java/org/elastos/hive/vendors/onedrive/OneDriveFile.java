@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -180,7 +181,20 @@ public class OneDriveFile extends HiveFile implements IHiveFile {
         CompletableFuture<ValueList> future = new CompletableFuture<>();
         ArrayList<Data> arrayList = new ArrayList<>();
         try {
-            Data data = doGetBuffer(key,null).get();
+            CompletableFuture<Data> innerFuture = doGetBuffer(key, new Callback<Data>() {
+                @Override
+                public void onError(HiveException e) {
+                    if (callback != null) callback.onError(e);
+                    future.completeExceptionally(e);
+                }
+
+                @Override
+                public void onSuccess(Data body) {
+                }
+            });
+            Data data = innerFuture.get();
+            if (innerFuture.isCompletedExceptionally()) return future;
+
             createValueResult(arrayList , data.getData());
 
             ValueList valueList = new ValueList(arrayList);
@@ -287,7 +301,8 @@ public class OneDriveFile extends HiveFile implements IHiveFile {
     private CompletableFuture<Length> doGetFileLength(String filename , org.elastos.hive.Callback<Length> callback){
         CompletableFuture<Length> future = new CompletableFuture() ;
         try {
-            Response response = requestFileInfo(filename);
+            String destFilePath = creatDestFilePath(filename);
+            Response response = requestFileInfo(destFilePath);
             int checkResponseCode = checkResponseCode(response) ;
             if (checkResponseCode == 0){
                 int fileLength = decodeFileLength(response);
@@ -625,19 +640,16 @@ public class OneDriveFile extends HiveFile implements IHiveFile {
     private void checkFileExistInBackEnd(String filename) throws Exception {
         String destFilePath = creatDestFilePath(filename);
         Response response = requestFileInfo(destFilePath);
-        LogUtil.d("errorbody = "+response.errorBody().toString());
         LogUtil.d("Code = "+response.code());
     }
 
     private void decodeFileInfo(Response response){
         FileOrDirPropResponse info = (FileOrDirPropResponse) response.body();
-
     }
 
     private Response requestFileInfo(String filename) throws Exception {
-        String destFilePath = creatDestFilePath(filename);
         Response response = ConnectionManager.getOnedriveApi()
-                .getDirAndFileInfo(destFilePath)
+                .getDirAndFileInfo(filename)
                 .execute();
         return response;
     }

@@ -8,55 +8,50 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.IHiveConnect;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.ValueList;
+import org.elastos.hive.util.TestUtils;
 import org.elastos.hive.vendors.onedrive.IHiveFile;
 import org.elastos.hive.result.Void;
-import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OneDriveKVTest {
 
     private static final String APPID = "afd3d647-a8b7-4723-bf9d-1b832f43b881";//f0f8fdc1-294e-4d5c-b3d8-774147075480
     private static final String SCOPE = "User.Read Files.ReadWrite.All offline_access";//offline_access Files.ReadWrite
     private static final String REDIRECTURL = "http://localhost:12345";//http://localhost:44316
 
-
     private static IHiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
     private static IHiveFile hiveFile ;
 
-//    private byte[]
-    private String value1 = "value1";
-    private String value2 = "value2";
-    private String value3 = "value3";
+    private String key = "KEY";
+    private String[] values = {"value1","value2","value3"};
+    private String newValue = "newValue";
 
 
     @Test
-    public void testGetInstance() {
-        assertNotNull(hiveFile);
-    }
-
-    @Test
-    public void testPutValue() {
-        Void future = null;
+    public void test_00_Prepare() {
         try {
-
-//            byte[] data = "test".getBytes() ;
-            future = hiveFile.putValue("KVT",value1.getBytes(),false).get();
+            hiveFile.deleteFile(key).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -65,66 +60,241 @@ public class OneDriveKVTest {
     }
 
     @Test
-    public void testGetValue() {
+    public void test_01_PutValue() {
         try {
-            ValueList valueList = hiveFile.getValue("KVT",false).get();
+            hiveFile.putValue(key,values[0].getBytes(),false).get();
+            hiveFile.putValue(key,values[1].getBytes(),false).get();
+            hiveFile.putValue(key,values[2].getBytes(),false).get();
+
+        } catch (InterruptedException e) {
+            assertNull(e);
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            assertNull(e);
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test_11_PutValueAsync() {
+        CompletableFuture future1 = hiveFile.putValue(key, values[0].getBytes(), false, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+            }
+        });
+        CompletableFuture future2 = hiveFile.putValue(key, values[1].getBytes(), false, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+            }
+        });
+
+        CompletableFuture future3 = hiveFile.putValue(key, values[2].getBytes(), false, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+            }
+        });
+
+        TestUtils.waitFinish(future1);
+        TestUtils.waitFinish(future2);
+        TestUtils.waitFinish(future3);
+
+        assertFalse(future1.isCompletedExceptionally());
+        assertFalse(future2.isCompletedExceptionally());
+        assertFalse(future3.isCompletedExceptionally());
+
+    }
+
+    @Test
+    public void test_02_GetValue() {
+        try {
+            ValueList valueList = hiveFile.getValue(key,false).get();
             ArrayList<Data> arrayDatas = valueList.getList();
+            assertEquals(3,arrayDatas.size());
             for (int i = 0 ; i < arrayDatas.size() ; i++){
-                byte[] data = arrayDatas.get(i).getData();
-                LogUtil.d("result = "+new String(data));
+                assertArrayEquals(values[i].getBytes(), arrayDatas.get(i).getData());
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+            assertNull(e);
         } catch (ExecutionException e) {
             e.printStackTrace();
+            assertNull(e);
         }
     }
 
     @Test
-    public void testGetValueAsync() {
-        CompletableFuture future = hiveFile.getValue("KVT", false, new Callback<ValueList>() {
+    public void test_12_GetValueAsync() {
+        CompletableFuture future = hiveFile.getValue(key, false, new Callback<ValueList>() {
             @Override
             public void onError(HiveException e) {
-
+                assertNull(e);
             }
 
             @Override
             public void onSuccess(ValueList body) {
-                ArrayList list = body.getList();
-
-                LogUtil.d("===============");
-                LogUtil.d("key = "+list);
-//                LogUtil.d("value = "+new String(value.getData()));
-//                LogUtil.d("length = "+length);
-                LogUtil.d("===============");
+                ArrayList<Data> arrayDatas = body.getList();
+                assertEquals(3,arrayDatas.size());
+                for (int i = 0 ; i < arrayDatas.size() ; i++){
+                    assertArrayEquals(values[i].getBytes(), arrayDatas.get(i).getData());
+                }
             }
         });
-        waitFinish(future);
+        TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
     }
 
 
     @Test
-    public void testSetValue() {
+    public void test_03_SetValue() {
         try {
-            byte[] data = "setValue".getBytes() ;
-            hiveFile.setValue("KVT",data,false).get();
+            hiveFile.setValue(key,newValue.getBytes(),false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            assertNull(e);
         } catch (ExecutionException e) {
             e.printStackTrace();
+            assertNull(e);
         }
     }
 
     @Test
-    public void testDeleteKey() {
+    public void test_13_SetValueAsync() {
+        hiveFile.setValue(key, newValue.getBytes(), false, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+            }
+        });
+    }
+
+    @Test
+    public void test_04_GetValue() {
         try {
-            hiveFile.deleteValueFromKey("KVT").get();
+            ValueList valueList = hiveFile.getValue(key,false).get();
+            ArrayList<Data> arrayDatas = valueList.getList();
+            assertEquals(1,arrayDatas.size());
+            for (int i = 0 ; i < arrayDatas.size() ; i++){
+                assertArrayEquals(newValue.getBytes(), arrayDatas.get(i).getData());
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
+            assertNull(e);
         } catch (ExecutionException e) {
             e.printStackTrace();
+            assertNull(e);
         }
     }
+
+    @Test
+    public void test_14_GetValueAsync() {
+        CompletableFuture future = hiveFile.getValue(key, false, new Callback<ValueList>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(ValueList body) {
+                ArrayList<Data> arrayDatas = body.getList();
+                assertEquals(1,arrayDatas.size());
+                for (int i = 0 ; i < arrayDatas.size() ; i++){
+                    assertArrayEquals(newValue.getBytes(), arrayDatas.get(i).getData());
+                }
+            }
+        });
+        TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
+    }
+
+    @Test
+    public void test_05_DeleteKey() {
+        try {
+            hiveFile.deleteValueFromKey(key).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            assertNull(e);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_15_DeleteKeyAsync() {
+        CompletableFuture future = hiveFile.deleteValueFromKey(key, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNull(e);
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+            }
+        });
+
+        TestUtils.waitFinish(future);
+        assertFalse(future.isCompletedExceptionally());
+    }
+
+    @Test
+    public void test_06_GetValue(){
+        CompletableFuture future = hiveFile.getValue(key, false, new Callback<ValueList>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNotNull(e);
+                assertEquals("Item not found.",e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(ValueList body) {
+            }
+        });
+        TestUtils.waitFinish(future);
+        assertTrue(future.isCompletedExceptionally());
+    }
+
+    @Test
+    public void test_16_GetValue(){
+        CompletableFuture future = hiveFile.getValue(key, false, new Callback<ValueList>() {
+            @Override
+            public void onError(HiveException e) {
+                assertNotNull(e);
+                assertEquals("Item not found.",e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(ValueList body) {
+            }
+        });
+        TestUtils.waitFinish(future);
+        assertTrue(future.isCompletedExceptionally());
+    }
+
+
 
     @BeforeClass
     public static void setUp(){
@@ -150,19 +320,8 @@ public class OneDriveKVTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown(){
         hiveClient.disConnect(hiveConnect);
         hiveClient.close();
-    }
-
-    private void waitFinish(CompletableFuture future){
-        while(!future.isDone()){
-            try {
-                LogUtil.d("1000");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
