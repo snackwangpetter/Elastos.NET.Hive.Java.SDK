@@ -49,13 +49,13 @@ public interface OneDriveApi {
 //    @GET(OneDriveConstance.DRIVE+"/{path}")
 //    Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
 
-    @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<FileOrDirPropResponse> createFile(@Path("path") String path);
 
 //    @POST(OneDriveConstance.DRIVE+"/{path}")
 //    Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
 
-    @GET(OneDriveConstance.DRIVE+"/root:/{path}")
+    @GET(OneDriveConstance.APP_ROOT+":/{path}")
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
     
 //    @GET(OneDriveConstance.DRIVE+"/root")
@@ -67,7 +67,7 @@ public interface OneDriveApi {
 //    @POST(OneDriveConstance.DRIVE+"/root:{path}:/copy")
 //    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
-    @DELETE(OneDriveConstance.DRIVE+"/root:{path}")
+    @DELETE(OneDriveConstance.APP_ROOT+":{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
 
 //    @GET(OneDriveConstance.DRIVE+"/root:{path}")
@@ -76,16 +76,16 @@ public interface OneDriveApi {
 //    @GET(OneDriveConstance.DRIVE+"/root:{path}")
 //    Call<FileOrDirPropResponse> getFileFromDir(@Path("path") String path);
 
-    @GET(OneDriveConstance.DRIVE+"/root:{path}:/children")
+    @GET(OneDriveConstance.APP_ROOT+":{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
     
     @GET(OneDriveConstance.DRIVE+"/root/children")
     Call<DirChildrenResponse> getRootChildren();
 
-    @GET(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @GET(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<ResponseBody> read(@Header("Accept-Encoding") String acceptEncoding, @Path("path") String path);
 
-    @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
 
 //    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")

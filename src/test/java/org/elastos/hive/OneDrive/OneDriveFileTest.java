@@ -75,14 +75,9 @@ public class OneDriveFileTest {
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-            assertNull(e);
         } catch (ExecutionException e) {
             e.printStackTrace();
-            assertNull(e);
         }
-
-
-
     }
 
     @Test
