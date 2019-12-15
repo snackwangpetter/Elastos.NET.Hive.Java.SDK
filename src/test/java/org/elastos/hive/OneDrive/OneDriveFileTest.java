@@ -366,13 +366,13 @@ public class OneDriveFileTest {
         });
 
         hiveConnect = hiveClient.connect(hiveConnectOptions);
-        hiveFile = hiveConnect.createHiveFile("/bar","");
+        hiveFile = hiveConnect.createHiveFile("/bar");
     }
 
 
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
         hiveClient.close();
     }

@@ -70,12 +70,12 @@ public class IPFSFileTest {
         }
 
         if (hiveConnect!=null){
-            hiveFile = hiveConnect.createHiveFile("","");
+            hiveFile = hiveConnect.createHiveFile();
         }
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
         hiveClient.close();
     }

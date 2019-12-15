@@ -46,7 +46,7 @@ public class IPFSFileRPCUnusedTest {
         }
 
         if (hiveConnect != null){
-            hiveFile = hiveConnect.createHiveFile("","");
+            hiveFile = hiveConnect.createHiveFile();
         }
 
         assertNull(hiveConnect);

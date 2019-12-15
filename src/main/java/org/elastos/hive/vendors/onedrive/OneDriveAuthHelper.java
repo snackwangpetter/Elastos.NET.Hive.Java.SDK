@@ -51,7 +51,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 	private static final String refreshTokenKey 	= "refresh_token";
 	private static final String expireAtKey 		= "expires_at";
 
-//	private final OAuthEntry authEntry;
 	private final String clientId;
 	private final String scope;
 	private final String redirectUrl;
@@ -69,7 +68,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 			ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
-			// TODO:
 		}
 	}
 
@@ -99,7 +97,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 				future.complete(placeHolder);
 				return future;
 			}
-
 			return redeemToken(callback);
 		}
 

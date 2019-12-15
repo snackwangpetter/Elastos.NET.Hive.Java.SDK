@@ -32,7 +32,7 @@ public class IPFSConnectNullTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
         hiveClient.close();
     }

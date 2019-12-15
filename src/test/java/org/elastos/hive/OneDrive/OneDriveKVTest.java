@@ -316,7 +316,7 @@ public class OneDriveKVTest {
         } catch (HiveException e) {
             e.printStackTrace();
         }
-        hiveFile = hiveConnect.createHiveFile("/bar","");
+        hiveFile = hiveConnect.createHiveFile("/bar");
     }
 
     @AfterClass

@@ -47,7 +47,7 @@ public class IPFSFileRPCNullTest {
         }
 
         if (hiveConnect != null){
-            hiveFile = hiveConnect.createHiveFile("","");
+            hiveFile = hiveConnect.createHiveFile();
         }
 
         assertNull(hiveConnect);

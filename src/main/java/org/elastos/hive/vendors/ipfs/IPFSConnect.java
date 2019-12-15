@@ -40,7 +40,12 @@ public class IPFSConnect implements IHiveConnect {
     }
 
     @Override
-    public <T extends HiveFile> T createHiveFile(String filename, String cid) {
+    public <T extends HiveFile> T createHiveFile(String filename) {
+        return (T) new IPFSFile(ipfsRpc);
+    }
+
+    @Override
+    public <T extends HiveFile> T createHiveFile() {
         return (T) new IPFSFile(ipfsRpc);
     }
 }

@@ -38,43 +38,14 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface OneDriveApi {
-
-    //https://graph.microsoft.com/v1.0/me/
-//    @GET(OneDriveConstance.ONE_DRIVE_API_BASE_URL)
-//    Call<ClientResponse> getInfo();
-
-//    @GET(OneDriveConstance.DRIVE)
-//    Call<DriveResponse> getDriveInfo();
-//
-//    @GET(OneDriveConstance.DRIVE+"/{path}")
-//    Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
-
     @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<FileOrDirPropResponse> createFile(@Path("path") String path);
 
-//    @POST(OneDriveConstance.DRIVE+"/{path}")
-//    Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
-
     @GET(OneDriveConstance.APP_ROOT+":/{path}")
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
-    
-//    @GET(OneDriveConstance.DRIVE+"/root")
-//    Call<FileOrDirPropResponse> getRootDirectoryInfo();
-
-//    @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
-//    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
-
-//    @POST(OneDriveConstance.DRIVE+"/root:{path}:/copy")
-//    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
     @DELETE(OneDriveConstance.APP_ROOT+":{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
-
-//    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-//    Call<FileOrDirPropResponse> getDirFromDir(@Path("path") String path);
-//
-//    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-//    Call<FileOrDirPropResponse> getFileFromDir(@Path("path") String path);
 
     @GET(OneDriveConstance.APP_ROOT+":{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
@@ -88,7 +59,7 @@ public interface OneDriveApi {
     @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
 
-//    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")
+//    @POST(OneDriveConstance.APP_ROOT+":{path}:/createUploadSession")
 //    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
 
 //    @PUT()

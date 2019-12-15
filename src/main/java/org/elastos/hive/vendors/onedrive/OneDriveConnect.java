@@ -60,7 +60,12 @@ public class OneDriveConnect implements IHiveConnect {
     }
 
     @Override
-    public <T extends HiveFile> T createHiveFile(String filename, String cid) {
+    public <T extends HiveFile> T createHiveFile(String filename) {
         return (T) new OneDriveFile(filename , authHelper);
+    }
+
+    @Override
+    public <T extends HiveFile> T createHiveFile() {
+        return (T) new OneDriveFile("" , authHelper);
     }
 }

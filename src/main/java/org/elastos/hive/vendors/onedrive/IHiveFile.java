@@ -45,9 +45,4 @@ public interface IHiveFile {
 
     CompletableFuture<Void> deleteValueFromKey(String key);
     CompletableFuture<Void> deleteValueFromKey(String key , Callback<Void> callback);
-
-    interface HiveKeyValuesIterateCallback{
-        boolean callback(String key , Data value , int length);
-    }
-
 }
