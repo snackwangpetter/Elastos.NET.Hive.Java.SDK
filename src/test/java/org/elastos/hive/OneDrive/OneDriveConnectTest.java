@@ -1,6 +1,6 @@
 package org.elastos.hive.OneDrive;
 
-import org.elastos.hive.HiveClient;
+import org.elastos.hive.Client;
 import org.elastos.hive.ClientOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.ConnectOptions;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class OneDriveConnectTest {
     private static HiveConnect hiveConnect ;
-    private static HiveClient hiveClient ;
+    private static Client hiveClient ;
 
     private static final String APPID = "afd3d647-a8b7-4723-bf9d-1b832f43b881";//f0f8fdc1-294e-4d5c-b3d8-774147075480
     private static final String SCOPE = "User.Read Files.ReadWrite.All offline_access";//offline_access Files.ReadWrite
@@ -32,17 +32,16 @@ public class OneDriveConnectTest {
     @BeforeClass
     public static void setUp(){
         ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new HiveClient(hiveOptions);
+        hiveClient = new Client(hiveOptions);
     }
 
     @Test
     public void testConnect() {
         ConnectOptions hiveConnectOptions =
                 new OneDriveConnectOptions.Builder()
-                        .clientId(APPID)
-                        .scope(SCOPE)
-                        .redirectUrl(REDIRECTURL)
-                        .authenticator(requestUrl -> {
+                        .setClientId(APPID)
+                        .setRedirectUrl(REDIRECTURL)
+                        .setAuthenticator(requestUrl -> {
                             try {
                                 Desktop.getDesktop().browse(new URI(requestUrl));
                             } catch (Exception e) {
@@ -56,6 +55,5 @@ public class OneDriveConnectTest {
     @AfterClass
     public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
-        hiveClient.close();
     }
 }
