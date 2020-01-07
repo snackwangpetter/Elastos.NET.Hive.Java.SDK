@@ -1,9 +1,9 @@
 package org.elastos.hive.ipfs;
 
 import org.elastos.hive.HiveClient;
-import org.elastos.hive.HiveClientOptions;
+import org.elastos.hive.ClientOptions;
 import org.elastos.hive.HiveConnect;
-import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.ConnectOptions;
 import org.elastos.hive.vendors.ipfs.IPFSRpcNode;
 import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.junit.AfterClass;
@@ -21,7 +21,7 @@ public class IPFSConnectTest {
 
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().storePath(STORE_PATH).build();
+        ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
         hiveClient = new HiveClient(hiveOptions);
         hiveRpcNodes[0] = new IPFSRpcNode("3.133.166.156",5001);
         hiveRpcNodes[1] = new IPFSRpcNode("13.59.79.222",5001);
@@ -33,7 +33,7 @@ public class IPFSConnectTest {
 
     @Test
     public void testConnect(){
-        HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
+        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
         hiveConnect = hiveClient.connect(hiveConnectOptions);
         assertNotNull(hiveConnect);
     }

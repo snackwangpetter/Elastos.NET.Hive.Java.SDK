@@ -22,33 +22,36 @@
 
 package org.elastos.hive;
 
-public class HiveConnectOptions {
-    protected enum HiveBackendType {
-        HiveBackendType_IPFS,
-        HiveBackendType_OneDrive,
-        HiveBackendType_ownCloud,
-        HiveDriveType_Butt
+public final class ClientOptions {
+    private String storePath;
+
+    private ClientOptions() {}
+
+    private void setStorePath(String storePath) {
+        this.storePath = storePath;
     }
 
-    private HiveBackendType backendType ;
-    private Authenticator authenticator ;
-
-    protected HiveConnectOptions(){
+    public String getStorePath() {
+        return storePath;
     }
 
-    HiveBackendType getBackendType(){
-        return this.backendType;
-    }
+    public static class Builder {
+        private ClientOptions options;
 
-    protected void setBackendType(HiveBackendType backendType) {
-        this.backendType = backendType;
-    }
+        public Builder() {
+            this.options = new ClientOptions();
+        }
 
-    protected Authenticator getAuthenticator() {
-        return authenticator;
-    }
+        public Builder setStorePath(String storePath) {
+            options.setStorePath(storePath);
+            return this;
+        }
 
-    protected void setAuthenticator(Authenticator authenticator) {
-        this.authenticator = authenticator;
+        public ClientOptions build() {
+            if (options.getStorePath() == null)
+                return null;
+
+            return options;
+        }
     }
 }

@@ -30,18 +30,18 @@ import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 public class HiveClient {
     private OneDriveConnect oneDriveConnect ;
     private IPFSConnect ipfsConnect ;
-    private HiveClientOptions options ;
+    private ClientOptions options ;
 
 
-    public HiveClient(HiveClientOptions hiveOptions){
+    public HiveClient(ClientOptions hiveOptions){
         options = hiveOptions ;
     }
 
     public void close() {
     }
 
-    public HiveConnect connect(HiveConnectOptions hiveConnectOptions){
-        HiveConnectOptions.HiveBackendType backendType = hiveConnectOptions.getBackendType();
+    public HiveConnect connect(ConnectOptions hiveConnectOptions){
+        ConnectOptions.HiveBackendType backendType = hiveConnectOptions.getBackendType();
         HiveConnect hiveConnect = null ;
         switch (backendType){
             case HiveBackendType_IPFS:
